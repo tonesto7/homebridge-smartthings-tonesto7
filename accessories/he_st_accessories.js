@@ -758,6 +758,23 @@ function HE_ST_Accessory(platform, device) {
                             break;
                     }
                 });
+            if (that.device.attributes.supportedThermostatModes !== undefined) {    
+                var validValuesArray = [];
+                if (that.device.attributes.supportedThermostatModes.includes("off")) {
+                    validValuesArray.push(0);
+                }
+                if ((that.device.attributes.supportedThermostatModes.includes("heat")) || (that.device.attributes.supportedThermostatModes.includes("emergency heat"))) {
+                    validValuesArray.push(1);
+                }
+                if (that.device.attributes.supportedThermostatModes.includes("cool")) {
+                    validValuesArray.push(2);
+                }
+                if (that.device.attributes.supportedThermostatModes.includes("auto")) {
+                    validValuesArray.push(3);
+                }
+                var validValues = {validValues: validValuesArray};
+                thisCharacteristic.setProps(validValues);
+            }
             platform.addAttributeUsage('thermostatMode', device.deviceid, thisCharacteristic);
             if (device.capabilities['Relative Humidity Measurement'] !== undefined) {
                 thisCharacteristic = that.getaddService(Service.Thermostat).getCharacteristic(Characteristic.CurrentRelativeHumidity)
