@@ -4,7 +4,7 @@ This is based off of @pdlove homebridge-smartthings
 
 [![npm version](https://badge.fury.io/js/homebridge-smartthings-tonesto7.svg)](https://badge.fury.io/js/homebridge-smartthings-tonesto7)
 
-**```Current SmartApp version: 1.5.2```**
+**```Current SmartApp version: 1.5.3```**
 
 <br>
 
@@ -43,6 +43,8 @@ This is based off of @pdlove homebridge-smartthings
 ***v1.5.1*** - Bug fixes
 
 ***v1.5.2*** - Bug fixes
+
+***v1.5.3*** - Added new inputs to allow filtering out specific capabilities from devices.  I'm going to work on more issues very soon.
 
 #### Homebridge Plugin:
 
@@ -120,8 +122,8 @@ _Note New SmartThings users: You must first enable github integration. (If you u
    * Click <u><b>```Save```</b></u>.
 * Click <u><b>```Update From Repo```</b></u>
    * Select <u>```homebridge-smartthings-tonesto7```</u>
-* You should have <u>homebridge-smartthings.groovy</u> in the New section. 
-   * Check the Box next to <u>```homebridge-smartthings.groovy```</u> 
+* You should have <u>homebridge-smartthings.groovy</u> in the New section.
+   * Check the Box next to <u>```homebridge-smartthings.groovy```</u>
    * Check <u><b>```Publish```</b></u> at the bottom
    * Click <u><b>```Execute Update```</b></u>.
 
@@ -134,23 +136,23 @@ _Note New SmartThings users: You must first enable github integration. (If you u
 
 ## 2. SmartApp Configuration
 
-* In the SmartThings Mobile App, goto <u>```Marketplace```</u> and select <u>```SmartApps```</u>. 
+* In the SmartThings Mobile App, goto <u>```Marketplace```</u> and select <u>```SmartApps```</u>.
 * At the bottom of the list, select <u>```My Apps```</u>
 * Select <u>```Homebridge (SmartThings)```</u> from the choices on thelist.
 * Configuring the App:
 
    <u>There are 4 inputs at the top that can be used to force a device to be discovered as a specific type in HomeKit</u>
-   
+
    Any other devices being added just Tap on the input next to an appropriate device group and then select each device you would like to use (The same devices can be in any of the Sensor, Switch, Other inputs)
     * There are several categories because of the way SmartThings assigns capabilities. So you might not see your device in one, but might in another.
     * Almost all devices contain the Refresh capability and are under the "Other Devices" group
     * Some sensors don't have a refresh and are under the "Sensor Devices" group.
     * Some devices, mainly Virtual Switches, only have the Switch Capability and are in the "Switch Devices".
-    
+
     <b>Selecting the same device in multiple categories it will only be shown once in HomeKit, so you can safely check them all in all groups</b>
 
  * Tap <u><b>```Done```</b></u>
- * Tap <u><b>```Done```</b></u> 
+ * Tap <u><b>```Done```</b></u>
  You are finished with the App configuration!
 
 <br>
@@ -164,9 +166,9 @@ _Note New SmartThings users: You must first enable github integration. (If you u
   <h3 style="padding: 0em .6em;">Config.json Settings Example</h3>
 
   <h4 style="padding: 0em .6em; margin-bottom: 5px;"><u>Example of all settings. Not all settings are required. Read the breakdown below</u></h4>
-   
+
    <div style="overflow:auto;width:auto;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #f8f8f2">{</span>
-   <span style="color: #f92672">&quot;platform&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;SmartThings&quot;</span><span style="color: #f8f8f2">,</span> 
+   <span style="color: #f92672">&quot;platform&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;SmartThings&quot;</span><span style="color: #f8f8f2">,</span>
    <span style="color: #f92672">&quot;name&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;SmartThings&quot;</span><span style="color: #f8f8f2">,</span>
    <span style="color: #f92672">&quot;app_url&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;https://graph.api.smartthings.com:443/api/smartapps/installations/&quot;</span><span style="color: #f8f8f2">,</span>
    <span style="color: #f92672">&quot;app_id&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;YOUR_APPS_ID&quot;</span><span style="color: #f8f8f2">,</span>

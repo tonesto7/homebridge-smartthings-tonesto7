@@ -1,11 +1,11 @@
 /**
  *  Homebridge SmartThing/Hubitat Interface
  *  Loosely Modelled off of Paul Lovelace's JSON API
- *  Copyright 2018 Anthony Santilli
+ *  Copyright 2018, 2019 Anthony Santilli
  */
 
-String appVersion() { return "1.5.2" }
-String appModified() { return "10-22-2018" }
+String appVersion() { return "1.5.3" }
+String appModified() { return "04-16-2019" }
 String platform() { return "SmartThings" }
 String appIconUrl() { return "https://raw.githubusercontent.com/tonesto7/homebridge-smartthings-tonesto7/master/images/hb_tonesto7@2x.png" }
 String getAppImg(imgName) { return "https://raw.githubusercontent.com/tonesto7/smartthings-tonesto7-public/master/resources/icons/$imgName" }
@@ -70,10 +70,21 @@ def mainPage() {
                 input "deviceList", "capability.refresh", title: "Other Devices: (${deviceList ? deviceList?.size() : 0} Selected)", multiple: true, submitOnChange: true, required: false, image: getAppImg("devices2.png")
             }
             section("Restrict Temp Device Creation") {
-                input "noTemp", "bool", title: "Remove Temp from Contacts and Water Sensors?", required: false, defaultValue: false, submitOnChange: true
+                input "noTemp", "bool", title: "Remove Temp from All Contacts and Water Sensors?", required: false, defaultValue: false, submitOnChange: true
                 if(settings?.noTemp) {
                     input "sensorAllowTemp", "capability.sensor", title: "Allow Temp on these Sensors", multiple: true, submitOnChange: true, required: false, image: getAppImg("temperature.png")
                 }
+            }
+            section("Remove Capabilities from Devices Creation") {
+                paragraph "This will allow you to filter out certain capabilities from creating unneeded devices under HomeKit"
+                input "removeTemp", "capability.temperatureMeasurement", title: "Remove Temp from these Sensors", multiple: true, submitOnChange: true, required: false, image: getAppImg("temperature.png")
+                input "removeSwitch", "capability.switch", title: "Remove Switch from these Devices", multiple: true, submitOnChange: true, required: false, image: getAppImg("switch.png")
+                input "removeContact", "capability.contactSensor", title: "Remove Contact from these Devices", multiple: true, submitOnChange: true, required: false, image: getAppImg("contact.png")
+                input "removeMotion", "capability.motionSensor", title: "Remove Motion from these Devices", multiple: true, submitOnChange: true, required: false, image: getAppImg("motion.png")
+                input "removeLevel", "capability.switchLevel", title: "Remove Level from these Devices", multiple: true, submitOnChange: true, required: false, image: getAppImg("speed_knob.png")
+                input "removeBattery", "capability.battery", title: "Remove Battery from these Devices", multiple: true, submitOnChange: true, required: false, image: getAppImg("battery.png")
+                input "removePresence", "capability.presenceSensor", title: "Remove Presence from these Devices", multiple: true, submitOnChange: true, required: false, image: getAppImg("presence.png")
+                input "removeTamper", "capability.tamperAlert", title: "Remove Tamper from these Devices", multiple: true, submitOnChange: true, required: false, image: getAppImg("tamper.jpg")
             }
             section("Create Devices for Modes in HomeKit?") {
                 paragraph title: "What are these for?", "A virtual switch will be created for each mode in HomeKit.\nThe switch will be ON when that mode is active.", state: "complete", image: getAppImg("info.png")
@@ -108,7 +119,7 @@ def mainPage() {
                 input "speakerList", "capability.switch", title: inputTitleStr("Speakers: (${speakerList ? speakerList?.size() : 0} Selected)"), description: "<i>Tap to select</i>", multiple: true, submitOnChange: true, required: false
                 input "shadesList", "capability.windowShade", title: inputTitleStr("Window Shades: (${shadesList ? shadesList?.size() : 0} Selected)"), description: "<i>Tap to select</i>", multiple: true, submitOnChange: true, required: false
             }
-            
+
             section(sectionTitleStr("All Other Devices:")) {
                 input "sensorList", "capability.sensor", title: inputTitleStr("Sensor Devices: (${sensorList ? sensorList?.size() : 0} Selected)"), description: "<i>Tap to select</i>", multiple: true, submitOnChange: true, required: false
                 input "switchList", "capability.switch", title: inputTitleStr("Switch Devices: (${switchList ? switchList?.size() : 0} Selected)"), description: "<i>Tap to select</i>", multiple: true, submitOnChange: true, required: false
@@ -119,6 +130,17 @@ def mainPage() {
                 if(settings?.noTemp) {
                     input "sensorAllowTemp", "capability.sensor", title: inputTitleStr("Allow Temp on these Sensors"), multiple: true, submitOnChange: true, required: false
                 }
+            }
+            section(sectionTitleStr("Remove Capabilities from Devices Creation")) {
+                paragraph '<h4 style="color: blue;">This will allow you to filter out certain capabilities from creating unneeded devices under HomeKit</h4>'
+                input "removeTemp", "capability.temperatureMeasurement", title: inputTitleStr("Remove Temp from these Sensors"), multiple: true, submitOnChange: true, required: false
+                input "removeSwitch", "capability.switch", title: inputTitleStr("Remove Switch from these Devices"), multiple: true, submitOnChange: true, required: false
+                input "removeContact", "capability.contactSensor", title: inputTitleStr("Remove Contact from these Devices"), multiple: true, submitOnChange: true, required: false
+                input "removeMotion", "capability.motionSensor", title: inputTitleStr("Remove Motion from these Devices"), multiple: true, submitOnChange: true, required: false
+                input "removeLevel", "capability.switchLevel", title: inputTitleStr("Remove Level from these Devices"), multiple: true, submitOnChange: true, required: false
+                input "removeBattery", "capability.battery", title: inputTitleStr("Remove Battery from these Devices"), multiple: true, submitOnChange: true, required: false
+                input "removePresence", "capability.presenceSensor", title: inputTitleStr("Remove Presence from these Devices"), multiple: true, submitOnChange: true, required: false
+                input "removeTamper", "capability.tamperAlert", title: inputTitleStr("Remove Tamper from these Devices"), multiple: true, submitOnChange: true, required: false
             }
             section("</br>${sectionTitleStr("Create Mode Devices in HomeKit?")}") {
                 paragraph '<small style="color: blue !important;"><i><b>Description:</b></small><br/><small style="color: grey !important;">A virtual switch will be created for each mode in HomeKit.</br>The switch will be ON when that mode is active.</i></small>', state: "complete"
@@ -134,7 +156,7 @@ def mainPage() {
             }
             section("<br/>${sectionTitleStr("Options:")}") {
                 input "showLogs", "bool", title: inputTitleStr("Show Events in Live Logs?"), required: false, defaultValue: true, submitOnChange: true
-                label title: inputTitleStr("App Label (optional)"), description: "Rename App", defaultValue: app?.name, required: false 
+                label title: inputTitleStr("App Label (optional)"), description: "Rename App", defaultValue: app?.name, required: false
             }
         }
     }
@@ -203,10 +225,10 @@ def initialize() {
     runIn(6, "registerSwitches", [overwrite: true])
     if(settings?.addSecurityDevice) {
         if(!isST()) {
-            subscribe(location, "hsmStatus", changeHandler) 
-            subscribe(location, "hsmRules", changeHandler) 
-            subscribe(location, "hsmAlert", changeHandler) 
-            subscribe(location, "hsmSetArm", changeHandler) 
+            subscribe(location, "hsmStatus", changeHandler)
+            subscribe(location, "hsmRules", changeHandler)
+            subscribe(location, "hsmAlert", changeHandler)
+            subscribe(location, "hsmSetArm", changeHandler)
         } else { subscribe(location, "alarmSystemStatus", changeHandler) }
     }
     if(settings?.modeList) {
@@ -321,8 +343,8 @@ def getSecurityDevice() {
         serialNumber: (!isST() ? "HSM" : "SHM"),
         firmwareVersion: "1.0.0",
         lastTime: null,
-        capabilities: ["Alarm System Status":1, "Alarm":1], 
-        commands: [], 
+        capabilities: ["Alarm System Status":1, "Alarm":1],
+        commands: [],
         attributes: ["alarmSystemStatus": getSecurityStatus()]
     ]
 }
@@ -443,7 +465,7 @@ def lanEventHandler(evt) {
                     def slurper = new groovy.json.JsonSlurper()
                     msgData = slurper?.parseText(msg?.body as String)
                     log.debug "msgData: $msgData"
-                    if(headerMap?.evtType) { 
+                    if(headerMap?.evtType) {
                         switch(headerMap?.evtType) {
                             case "hkCommand":
                                 // log.trace "hkCommand($msgData)"
@@ -615,6 +637,14 @@ def deviceCapabilityList(device) {
         }
         if(remTemp) { items.remove("Temperature Measurement") }
     }
+    if(settings.removeBattery && items["Battery"]) items.remove("Battery")
+    if(settings.removeSwitch && items["Switch"]) items.remove("Switch")
+    if(settings.removeTemp && items["Temperature Measurement"]) items.remove("Temperature Measurement")
+    if(settings.removeContact && items["Contact Sensor"]) items.remove("Contact Sensor")
+    if(settings.removeLevel && items["Switch Level"]) items.remove("Switch Level")
+    if(settings.removeMotion && items["Motion Sensor"]) items.remove("Motion Sensor")
+    if(settings.removePresence && items["Presence Sensor"]) items.remove("Presence Sensor")
+    if(settings.removeTamper && items["Tamper Alert"]) items.remove("Tamper Alert")
     return items
 }
 
@@ -684,6 +714,12 @@ def ignoreTheseAttributes() {
     ]
 }
 
+def isDeviceInInput(setKey, devId){
+    List aItems = settings[setKey] ? settings[setKey]?.collect { it?.getId() as String } : []
+    if(aItems?.contains(devId as String)) { return true }
+    return false
+}
+
 def registerChangeHandler(devices, showlog=false) {
     devices?.each { device ->
         List theAtts = device?.supportedAttributes?.collect { it?.name as String }?.unique()
@@ -693,11 +729,19 @@ def registerChangeHandler(devices, showlog=false) {
                 if(settings?.noTemp && att == "temperature" && (device?.hasAttribute("contact") || device?.hasAttribute("water"))) {
                     Boolean skipAtt = true
                     if(settings?.sensorAllowTemp) {
-                        List aItems = settings?.sensorAllowTemp?.collect { it?.getId() as String } ?: []
-                        if(aItems?.contains(device?.id as String)) { skipAtt = false }
+                        skipAtt = isDeviceInInput('sensorAllowTemp', device?.id)
                     }
                     if(skipAtt) { return }
-                } 
+                }
+                if(att == "battery" && settings.removeBattery && isDeviceInInput('removeBattery', device?.id)) {return}
+                if(att == "switch" && settings.removeSwitch && isDeviceInInput('removeSwitch', device?.id)) {return}
+                if(att == "temperature" && settings.removeTemp && isDeviceInInput('removeTemp', device?.id)) {return}
+                if(att == "contact" && settings.removeContact && isDeviceInInput('removeContact', device?.id)) {return}
+                if(att == "level" && settings.removeLevel && isDeviceInInput('removeLevel', device?.id)) { return }
+                if(att == "motion" && settings.removeMotion && isDeviceInInput('removeMotion', device?.id)) { return }
+                if(att == "presence" && settings.removePresence && isDeviceInInput('removePresence', device?.id)) { return }
+                if(att == "tamper" && settings.removeTamper && isDeviceInInput('removeTamper', device?.id)) { return }
+
                 subscribe(device, att, "changeHandler")
                 if(showlog) { log.debug "Registering ${device?.displayName}.${att}" }
             }
