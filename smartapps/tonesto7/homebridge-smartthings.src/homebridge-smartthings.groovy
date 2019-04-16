@@ -38,7 +38,7 @@ def appInfoSect()	{
                 <ul style=" margin: 0 auto; padding: 0; list-style-type: none;">
                 <img style="float: left; padding: 10px;" src="https://raw.githubusercontent.com/tonesto7/homebridge-smartthings-tonesto7/master/images/hb_tonesto7@1x.png" width="70px"/>
                 <li style="padding-top: 2px;"><b>${app?.name}</b></li>
-                <li><small style="color: black !important;">Copyright\u00A9 2018 Anthony Santilli</small></li>
+                <li><small style="color: black !important;">Copyright\u00A9 2019 Anthony Santilli</small></li>
                 <li><small style="color: black !important;">Version: ${appVersion()}</small></li>
                 </ul>
             </div>
@@ -637,14 +637,14 @@ def deviceCapabilityList(device) {
         }
         if(remTemp) { items.remove("Temperature Measurement") }
     }
-    if(settings.removeBattery && items["Battery"]) items.remove("Battery")
-    if(settings.removeSwitch && items["Switch"]) items.remove("Switch")
-    if(settings.removeTemp && items["Temperature Measurement"]) items.remove("Temperature Measurement")
-    if(settings.removeContact && items["Contact Sensor"]) items.remove("Contact Sensor")
-    if(settings.removeLevel && items["Switch Level"]) items.remove("Switch Level")
-    if(settings.removeMotion && items["Motion Sensor"]) items.remove("Motion Sensor")
-    if(settings.removePresence && items["Presence Sensor"]) items.remove("Presence Sensor")
-    if(settings.removeTamper && items["Tamper Alert"]) items.remove("Tamper Alert")
+    if(settings.removeBattery && items["Battery"] && isDeviceInInput('removeBattery', device?.id)) { items.remove("Battery"); log.debug "Filtering Battery" }
+    if(settings.removeSwitch && items["Switch"] && isDeviceInInput('removeSwitch', device?.id)) { items.remove("Switch"); log.debug "Filtering Switch" }
+    if(settings.removeTemp && items["Temperature Measurement"] && isDeviceInInput('removeTemp', device?.id)) { items.remove("Temperature Measurement"); log.debug "Filtering Temp" }
+    if(settings.removeContact && items["Contact Sensor"] && isDeviceInInput('removeContact', device?.id)) { items.remove("Contact Sensor"); log.debug "Filtering Contact" }
+    if(settings.removeLevel && items["Switch Level"] && isDeviceInInput('removeLevel', device?.id)) { items.remove("Switch Level"); log.debug "Filtering Level" }
+    if(settings.removeMotion && items["Motion Sensor"] && isDeviceInInput('removeMotion', device?.id)) { items.remove("Motion Sensor"); log.debug "Filtering Motion" }
+    if(settings.removePresence && items["Presence Sensor"] && isDeviceInInput('removePresence', device?.id)) { items.remove("Presence Sensor"); log.debug "Filtering Presence" }
+    if(settings.removeTamper && items["Tamper Alert"] && isDeviceInInput('removeTamper', device?.id)) { items.remove("Tamper Alert"); log.debug "Filtering Tamper" }
     return items
 }
 
