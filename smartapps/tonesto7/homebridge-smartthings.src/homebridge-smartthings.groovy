@@ -83,6 +83,7 @@ def mainPage() {
                 input "removeMotion", "capability.motionSensor", title: "Remove Motion from these Devices", multiple: true, submitOnChange: true, required: false, image: getAppImg("motion.png")
                 input "removeLevel", "capability.switchLevel", title: "Remove Level from these Devices", multiple: true, submitOnChange: true, required: false, image: getAppImg("speed_knob.png")
                 input "removeBattery", "capability.battery", title: "Remove Battery from these Devices", multiple: true, submitOnChange: true, required: false, image: getAppImg("battery.png")
+                input "removePower", "capability.powerMeter", title: "Remove Power Meter from these Devices", multiple: true, submitOnChange: true, required: false, image: getAppImg("power.png")
                 input "removePresence", "capability.presenceSensor", title: "Remove Presence from these Devices", multiple: true, submitOnChange: true, required: false, image: getAppImg("presence.png")
                 input "removeTamper", "capability.tamperAlert", title: "Remove Tamper from these Devices", multiple: true, submitOnChange: true, required: false, image: getAppImg("tamper.jpg")
             }
@@ -140,6 +141,7 @@ def mainPage() {
                 input "removeLevel", "capability.switchLevel", title: inputTitleStr("Remove Level from these Devices"), multiple: true, submitOnChange: true, required: false
                 input "removeBattery", "capability.battery", title: inputTitleStr("Remove Battery from these Devices"), multiple: true, submitOnChange: true, required: false
                 input "removePresence", "capability.presenceSensor", title: inputTitleStr("Remove Presence from these Devices"), multiple: true, submitOnChange: true, required: false
+                input "removePower", "capability.powerMeter", title: inputTitleStr("Remove Power Meter from these Devices"), multiple: true, submitOnChange: true, required: false
                 input "removeTamper", "capability.tamperAlert", title: inputTitleStr("Remove Tamper from these Devices"), multiple: true, submitOnChange: true, required: false
             }
             section("</br>${sectionTitleStr("Create Mode Devices in HomeKit?")}") {
@@ -643,6 +645,7 @@ def deviceCapabilityList(device) {
     if(settings.removeContact && items["Contact Sensor"] && isDeviceInInput('removeContact', device?.id)) { items.remove("Contact Sensor"); log.debug "Filtering Contact" }
     if(settings.removeLevel && items["Switch Level"] && isDeviceInInput('removeLevel', device?.id)) { items.remove("Switch Level"); log.debug "Filtering Level" }
     if(settings.removeMotion && items["Motion Sensor"] && isDeviceInInput('removeMotion', device?.id)) { items.remove("Motion Sensor"); log.debug "Filtering Motion" }
+    if(settings.removePower && items["Power Meter"] && isDeviceInInput('removePower', device?.id)) { items.remove("Power Meter"); log.debug "Filtering Power Meter" }
     if(settings.removePresence && items["Presence Sensor"] && isDeviceInInput('removePresence', device?.id)) { items.remove("Presence Sensor"); log.debug "Filtering Presence" }
     if(settings.removeTamper && items["Tamper Alert"] && isDeviceInInput('removeTamper', device?.id)) { items.remove("Tamper Alert"); log.debug "Filtering Tamper" }
     return items
@@ -710,7 +713,8 @@ def ignoreTheseAttributes() {
         'codeReport', 'scanCodes', 'verticalAccuracy', 'horizontalAccuracyMetric', 'altitudeMetric', 'latitude', 'distanceMetric', 'closestPlaceDistanceMetric',
         'closestPlaceDistance', 'leavingPlace', 'currentPlace', 'codeChanged', 'codeLength', 'lockCodes', 'healthStatus', 'horizontalAccuracy', 'bearing', 'speedMetric',
         'speed', 'verticalAccuracyMetric', 'altitude', 'indicatorStatus', 'todayCost', 'longitude', 'distance', 'previousPlace','closestPlace', 'places', 'minCodeLength',
-        'arrivingAtPlace', 'lastUpdatedDt', 'scheduleType', 'zoneStartDate', 'zoneElapsed', 'zoneDuration', 'watering'
+        'arrivingAtPlace', 'lastUpdatedDt', 'scheduleType', 'zoneStartDate', 'zoneElapsed', 'zoneDuration', 'watering', 'eventTime', 'eventSummary', 'endOffset', 'startOffset',
+        'closeTime', 'endMsgTime', 'endMsg', 'openTime', 'startMsgTime', 'startMsg', 'calName'
     ]
 }
 
@@ -739,6 +743,7 @@ def registerChangeHandler(devices, showlog=false) {
                 if(att == "contact" && settings.removeContact && isDeviceInInput('removeContact', device?.id)) {return}
                 if(att == "level" && settings.removeLevel && isDeviceInInput('removeLevel', device?.id)) { return }
                 if(att == "motion" && settings.removeMotion && isDeviceInInput('removeMotion', device?.id)) { return }
+                if(att == "power" && settings.removePower && isDeviceInInput('removePower', device?.id)) { return }
                 if(att == "presence" && settings.removePresence && isDeviceInInput('removePresence', device?.id)) { return }
                 if(att == "tamper" && settings.removeTamper && isDeviceInInput('removeTamper', device?.id)) { return }
 
