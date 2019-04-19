@@ -405,16 +405,49 @@ function HE_ST_Accessory(platform, device) {
         if (device.capabilities['Button'] !== undefined) {
             that.deviceGroup = 'button';
             platform.log('Button: (' + that.name + ')');
-            thisCharacteristic = that.getaddService(Service.Switch).getCharacteristic(Characteristic.On)
+            thisCharacteristic = that.getaddService(Service.StatelessProgrammableSwitch).getCharacteristic(Characteristic.ProgrammableSwitchEvent)
                 .on('get', function(callback) {
-                    callback(null, that.device.attributes.switch === 'on');
-                })
-                .on('set', function(value, callback) {
-                    if (value && that.device.attributes.switch === 'off') {
-                        platform.api.runCommand(callback, device.deviceid, 'button');
+                    // Reset value to force `change` to fire for repeated presses
+                    this.value = -1;
+
+                    switch(that.device.attributes.button) {
+                        case 'pushed':
+                            return callback(null, Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS);
+                        case 'held':
+                            return callback(null, Characteristic.ProgrammableSwitchEvent.LONG_PRESS);
+                        case 'double':
+                            return callback(null, Characteristic.ProgrammableSwitchEvent.DOUBLE_PRESS);
+                        default:
+                            return callback(null, null);
                     }
-                });
-            platform.addAttributeUsage('switch', device.deviceid, thisCharacteristic);
+                })
+
+            const validValues = [ ];
+
+            if(typeof that.device.attributes.supportedButtonValues === 'string') {
+                for(const value of JSON.parse(that.device.attributes.supportedButtonValues)) {
+                    switch(value) {
+                        case 'pushed':
+                            validValues.push(Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS);
+                            continue;
+                        case 'held':
+                            validValues.push(Characteristic.ProgrammableSwitchEvent.LONG_PRESS);
+                            continue;
+                        case 'double':
+                            validValues.push(Characteristic.ProgrammableSwitchEvent.DOUBLE_PRESS);
+                            continue;
+                        default:
+                            platform.log('Button: (' + that.name + ') unsupported button value: ' + value);
+                    }
+                }
+
+                thisCharacteristic.setProps({ validValues });
+            }
+
+            // Turned on by default for Characteristic.ProgrammableSwitchEvent, required to emit `change`
+            thisCharacteristic.eventOnlyCharacteristic = false;
+
+            platform.addAttributeUsage('button', device.deviceid, thisCharacteristic);
         }
 
         // This should catch the remaining switch devices that are specially defined
