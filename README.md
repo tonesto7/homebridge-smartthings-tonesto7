@@ -85,6 +85,8 @@ This is based off of @pdlove homebridge-smartthings
 
 ***v1.5.5*** - Fix for broken lock command
 
+***v1.5.6*** - Merged changes from @torandreroland for thermostatMode fixes, and from @shnhrrsn button mode fixes.  Updated the request-promise package to v4.2.4
+
 <br>
 
 ## This version is not compatible with prior versions of homebridge-smartthings Smartapp.
