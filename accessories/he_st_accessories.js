@@ -791,7 +791,7 @@ function HE_ST_Accessory(platform, device) {
                             break;
                     }
                 });
-            if (that.device.attributes.supportedThermostatModes !== undefined) {    
+            if (typeof that.device.attributes.supportedThermostatModes === 'string') {    
                 var validValuesArray = [];
                 if (that.device.attributes.supportedThermostatModes.includes("off")) {
                     validValuesArray.push(0);
