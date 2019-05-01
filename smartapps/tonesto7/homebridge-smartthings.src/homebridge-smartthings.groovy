@@ -75,7 +75,7 @@ def mainPage() {
                     input "sensorAllowTemp", "capability.sensor", title: "Allow Temp on these Sensors", multiple: true, submitOnChange: true, required: false, image: getAppImg("temperature.png")
                 }
             }
-            section("Remove Capabilities from Devices Creation") {
+            section("Remove Capabilities from Devices Creation", hideable: true, hidden: false) {
                 paragraph "This will allow you to filter out certain capabilities from creating unneeded devices under HomeKit"
                 input "removeTemp", "capability.temperatureMeasurement", title: "Remove Temp from these Sensors", multiple: true, submitOnChange: true, required: false, image: getAppImg("temperature.png")
                 input "removeSwitch", "capability.switch", title: "Remove Switch from these Devices", multiple: true, submitOnChange: true, required: false, image: getAppImg("switch.png")
@@ -132,7 +132,7 @@ def mainPage() {
                     input "sensorAllowTemp", "capability.sensor", title: inputTitleStr("Allow Temp on these Sensors"), multiple: true, submitOnChange: true, required: false
                 }
             }
-            section(sectionTitleStr("Remove Capabilities from Devices Creation")) {
+            section(sectionTitleStr("Remove Capabilities from Devices Creation"), hideable: true, hidden: (state?.isInstalled == true)) {
                 paragraph '<h4 style="color: blue;">This will allow you to filter out certain capabilities from creating unneeded devices under HomeKit</h4>'
                 input "removeTemp", "capability.temperatureMeasurement", title: inputTitleStr("Remove Temp from these Sensors"), multiple: true, submitOnChange: true, required: false
                 input "removeSwitch", "capability.switch", title: inputTitleStr("Remove Switch from these Devices"), multiple: true, submitOnChange: true, required: false
