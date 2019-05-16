@@ -4,8 +4,8 @@
  *  Copyright 2018, 2019 Anthony Santilli
  */
 
-String appVersion() { return "1.5.3" }
-String appModified() { return "04-16-2019" }
+String appVersion() { return "1.5.4" }
+String appModified() { return "05-16-2019" }
 String platform() { return "SmartThings" }
 String appIconUrl() { return "https://raw.githubusercontent.com/tonesto7/homebridge-smartthings-tonesto7/master/images/hb_tonesto7@2x.png" }
 String getAppImg(imgName) { return "https://raw.githubusercontent.com/tonesto7/smartthings-tonesto7-public/master/resources/icons/$imgName" }
@@ -471,8 +471,8 @@ def lanEventHandler(evt) {
                         switch(headerMap?.evtType) {
                             case "hkCommand":
                                 // log.trace "hkCommand($msgData)"
-                                def val1 = msgData?.value1 ?: null
-                                def val2 = msgData?.value2 ?: null
+                                def val1 = msgData?.values?.value1 ?: null
+                                def val2 = msgData?.values?.value2 ?: null
                                 processCmd(msgData?.deviceid, msgData?.command, val1, val2, true)
                                 break
                             case "enableDirect":

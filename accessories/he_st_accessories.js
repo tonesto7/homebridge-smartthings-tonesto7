@@ -405,12 +405,25 @@ function HE_ST_Accessory(platform, device) {
         if (device.capabilities['Button'] !== undefined) {
             that.deviceGroup = 'button';
             platform.log('Button: (' + that.name + ')');
+            //Old Button Logic
+            // thisCharacteristic = that.getaddService(Service.Switch).getCharacteristic(Characteristic.On)
+            //     .on('get', function(callback) {
+            //         callback(null, that.device.attributes.switch === 'on');
+            //     })
+            //     .on('set', function(value, callback) {
+            //         if (value && that.device.attributes.switch === 'off') {
+            //             platform.api.runCommand(callback, device.deviceid, 'button');
+            //         }
+            //     });
+            // platform.addAttributeUsage('switch', device.deviceid, thisCharacteristic);
+
+            // New STATELESS BUTTON LOGIC (By @shnhrrsn)
             thisCharacteristic = that.getaddService(Service.StatelessProgrammableSwitch).getCharacteristic(Characteristic.ProgrammableSwitchEvent)
                 .on('get', function(callback) {
                     // Reset value to force `change` to fire for repeated presses
                     this.value = -1;
 
-                    switch(that.device.attributes.button) {
+                    switch (that.device.attributes.button) {
                         case 'pushed':
                             return callback(null, Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS);
                         case 'held':
@@ -420,13 +433,13 @@ function HE_ST_Accessory(platform, device) {
                         default:
                             return callback(null, null);
                     }
-                })
+                });
 
-            const validValues = [ ];
+            const validValues = [];
 
-            if(typeof that.device.attributes.supportedButtonValues === 'string') {
-                for(const value of JSON.parse(that.device.attributes.supportedButtonValues)) {
-                    switch(value) {
+            if (typeof that.device.attributes.supportedButtonValues === 'string') {
+                for (const value of JSON.parse(that.device.attributes.supportedButtonValues)) {
+                    switch (value) {
                         case 'pushed':
                             validValues.push(Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS);
                             continue;
@@ -643,12 +656,12 @@ function HE_ST_Accessory(platform, device) {
                 that.deviceGroup = 'sensor';
             }
             thisCharacteristic = that.getaddService(Service.TemperatureSensor).getCharacteristic(Characteristic.CurrentTemperature)
+                .setProps({
+                    minValue: parseFloat(-50),
+                    maxValue: parseFloat(100)
+                })
                 .on('get', function(callback) {
-                    if (platform.temperature_unit === 'C') {
-                        callback(null, Math.round(that.device.attributes.temperature * 10) / 10);
-                    } else {
-                        callback(null, Math.round((that.device.attributes.temperature - 32) / 1.8 * 10) / 10);
-                    }
+                    callback(null, tempConversion(platform.temperature_unit, that.device.attributes.temperature));
                 });
             platform.addAttributeUsage('temperature', device.deviceid, thisCharacteristic);
             if (device.capabilities['Tamper Alert'] !== undefined || device.capabilities['TamperAlert'] !== undefined) {
@@ -791,8 +804,8 @@ function HE_ST_Accessory(platform, device) {
                             break;
                     }
                 });
-            if (typeof that.device.attributes.supportedThermostatModes === 'string') {    
-                var validValuesArray = [];
+            if (typeof that.device.attributes.supportedThermostatModes === 'string') {
+                let validValuesArray = [];
                 if (that.device.attributes.supportedThermostatModes.includes("off")) {
                     validValuesArray.push(0);
                 }
@@ -805,7 +818,7 @@ function HE_ST_Accessory(platform, device) {
                 if (that.device.attributes.supportedThermostatModes.includes("auto")) {
                     validValuesArray.push(3);
                 }
-                var validValues = {validValues: validValuesArray};
+                let validValues = { validValues: validValuesArray };
                 thisCharacteristic.setProps(validValues);
             }
             platform.addAttributeUsage('thermostatMode', device.deviceid, thisCharacteristic);
@@ -818,11 +831,7 @@ function HE_ST_Accessory(platform, device) {
             }
             thisCharacteristic = that.getaddService(Service.Thermostat).getCharacteristic(Characteristic.CurrentTemperature)
                 .on('get', function(callback) {
-                    if (platform.temperature_unit === 'C') {
-                        callback(null, Math.round(that.device.attributes.temperature * 10) / 10);
-                    } else {
-                        callback(null, Math.round((that.device.attributes.temperature - 32) / 1.8 * 10) / 10);
-                    }
+                    callback(null, tempConversion(platform.temperature_unit, that.device.attributes.temperature));
                 });
             platform.addAttributeUsage('temperature', device.deviceid, thisCharacteristic);
             thisCharacteristic = that.getaddService(Service.Thermostat).getCharacteristic(Characteristic.TargetTemperature)
@@ -847,10 +856,8 @@ function HE_ST_Accessory(platform, device) {
                     }
                     if (!temp) {
                         callback('Unknown');
-                    } else if (platform.temperature_unit === 'C') {
-                        callback(null, Math.round(temp * 10) / 10);
                     } else {
-                        callback(null, Math.round((temp - 32) / 1.8 * 10) / 10);
+                        callback(null, tempConversion(platform.temperature_unit, temp));
                     }
                 })
                 .on('set', function(value, callback) {
@@ -910,11 +917,7 @@ function HE_ST_Accessory(platform, device) {
             // platform.addAttributeUsage("temperature_unit", "platform", thisCharacteristic);
             thisCharacteristic = that.getaddService(Service.Thermostat).getCharacteristic(Characteristic.HeatingThresholdTemperature)
                 .on('get', function(callback) {
-                    if (platform.temperature_unit === 'C') {
-                        callback(null, Math.round(that.device.attributes.heatingSetpoint * 10) / 10);
-                    } else {
-                        callback(null, Math.round((that.device.attributes.heatingSetpoint - 32) / 1.8 * 10) / 10);
-                    }
+                    callback(null, tempConversion(platform.temperature_unit, that.device.attributes.heatingSetpoint));
                 })
                 .on('set', function(value, callback) {
                     // Convert the Celsius value to the appropriate unit for Smartthings
@@ -932,11 +935,7 @@ function HE_ST_Accessory(platform, device) {
             platform.addAttributeUsage('heatingSetpoint', device.deviceid, thisCharacteristic);
             thisCharacteristic = that.getaddService(Service.Thermostat).getCharacteristic(Characteristic.CoolingThresholdTemperature)
                 .on('get', function(callback) {
-                    if (platform.temperature_unit === 'C') {
-                        callback(null, Math.round(that.device.attributes.coolingSetpoint * 10) / 10);
-                    } else {
-                        callback(null, Math.round((that.device.attributes.coolingSetpoint - 32) / 1.8 * 10) / 10);
-                    }
+                    callback(null, tempConversion(platform.temperature_unit, that.device.attributes.coolingSetpoint));
                 })
                 .on('set', function(value, callback) {
                     // Convert the Celsius value to the appropriate unit for Smartthings
@@ -977,6 +976,14 @@ function HE_ST_Accessory(platform, device) {
         }
     }
     this.loadData(device, that);
+}
+
+function tempConversion(tUnit, tempVal) {
+    if (tUnit === 'C') {
+        return (parseFloat(tempVal * 10) / 10);
+    } else {
+        return (parseFloat((tempVal - 32) / 1.8 * 10) / 10);
+    }
 }
 
 function fanSpeedConversion(speedVal, has4Spd = false) {
