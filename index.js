@@ -327,6 +327,8 @@ function he_st_api_HandleHTTPResponse(request, response, myHe_st_api) {
             body.push(chunk);
         }).on('end', () => {
             body = Buffer.concat(body).toString();
+            if (body.length < 3)
+                return;
             let data = JSON.parse(body);
             if (Object.keys(data).length > 3) {
                 var newChange = {
