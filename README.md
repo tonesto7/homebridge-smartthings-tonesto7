@@ -4,7 +4,7 @@ This is based off of @pdlove homebridge-smartthings
 
 [![npm version](https://badge.fury.io/js/homebridge-smartthings-tonesto7.svg)](https://badge.fury.io/js/homebridge-smartthings-tonesto7)
 
-**```Current SmartApp version: 1.5.3```**
+**```Current SmartApp version: 1.5.4```**
 
 <br>
 
@@ -46,6 +46,8 @@ This is based off of @pdlove homebridge-smartthings
 
 ***v1.5.3*** - Added new inputs to allow filtering out specific capabilities from devices.  I'm going to work on more issues very soon.
 
+***v1.5.4*** - Fixes for Local Commands (#24) and a few other tweaks.
+
 #### Homebridge Plugin:
 
 ***v1.1.5*** - Lot's of new capabilities supported in HomeKit
@@ -86,6 +88,8 @@ This is based off of @pdlove homebridge-smartthings
 ***v1.5.5*** - Fix for broken lock command
 
 ***v1.5.6*** - Merged changes from @torandreroland for thermostatMode fixes, and from @shnhrrsn button mode fixes.  Updated the request-promise package to v4.2.4
+
+***v1.5.7*** - Merged Thermostat fixes from @torandreroland, fixed temperatures to support negative temps, and a few other tweaks.
 
 <br>
 

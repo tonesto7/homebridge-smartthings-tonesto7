@@ -4,8 +4,8 @@
  *  Copyright 2018, 2019 Anthony Santilli
  */
 
-String appVersion() { return "1.5.3" }
-String appModified() { return "04-16-2019" }
+String appVersion() { return "1.5.4" }
+String appModified() { return "05-16-2019" }
 String platform() { return "SmartThings" }
 String appIconUrl() { return "https://raw.githubusercontent.com/tonesto7/homebridge-smartthings-tonesto7/master/images/hb_tonesto7@2x.png" }
 String getAppImg(imgName) { return "https://raw.githubusercontent.com/tonesto7/smartthings-tonesto7-public/master/resources/icons/$imgName" }
@@ -75,7 +75,7 @@ def mainPage() {
                     input "sensorAllowTemp", "capability.sensor", title: "Allow Temp on these Sensors", multiple: true, submitOnChange: true, required: false, image: getAppImg("temperature.png")
                 }
             }
-            section("Remove Capabilities from Devices Creation") {
+            section("Remove Capabilities from Devices Creation", hideable: true, hidden: false) {
                 paragraph "This will allow you to filter out certain capabilities from creating unneeded devices under HomeKit"
                 input "removeTemp", "capability.temperatureMeasurement", title: "Remove Temp from these Sensors", multiple: true, submitOnChange: true, required: false, image: getAppImg("temperature.png")
                 input "removeSwitch", "capability.switch", title: "Remove Switch from these Devices", multiple: true, submitOnChange: true, required: false, image: getAppImg("switch.png")
@@ -132,7 +132,7 @@ def mainPage() {
                     input "sensorAllowTemp", "capability.sensor", title: inputTitleStr("Allow Temp on these Sensors"), multiple: true, submitOnChange: true, required: false
                 }
             }
-            section(sectionTitleStr("Remove Capabilities from Devices Creation")) {
+            section(sectionTitleStr("Remove Capabilities from Devices Creation"), hideable: true, hidden: (state?.isInstalled == true)) {
                 paragraph '<h4 style="color: blue;">This will allow you to filter out certain capabilities from creating unneeded devices under HomeKit</h4>'
                 input "removeTemp", "capability.temperatureMeasurement", title: inputTitleStr("Remove Temp from these Sensors"), multiple: true, submitOnChange: true, required: false
                 input "removeSwitch", "capability.switch", title: inputTitleStr("Remove Switch from these Devices"), multiple: true, submitOnChange: true, required: false
@@ -471,8 +471,8 @@ def lanEventHandler(evt) {
                         switch(headerMap?.evtType) {
                             case "hkCommand":
                                 // log.trace "hkCommand($msgData)"
-                                def val1 = msgData?.value1 ?: null
-                                def val2 = msgData?.value2 ?: null
+                                def val1 = msgData?.values?.value1 ?: null
+                                def val2 = msgData?.values?.value2 ?: null
                                 processCmd(msgData?.deviceid, msgData?.command, val1, val2, true)
                                 break
                             case "enableDirect":
