@@ -4,8 +4,8 @@
  *  Copyright 2018, 2019 Anthony Santilli
  */
 
-String appVersion() { return "1.5.4" }
-String appModified() { return "05-16-2019" }
+String appVersion() { return "1.5.5" }
+String appModified() { return "06-10-2019" }
 String platform() { return "SmartThings" }
 String appIconUrl() { return "https://raw.githubusercontent.com/tonesto7/homebridge-smartthings-tonesto7/master/images/hb_tonesto7@2x.png" }
 String getAppImg(imgName) { return "https://raw.githubusercontent.com/tonesto7/smartthings-tonesto7-public/master/resources/icons/$imgName" }
@@ -63,6 +63,7 @@ def mainPage() {
                 input "lightList", "capability.switch", title: "Lights: (${lightList ? lightList?.size() : 0} Selected)", multiple: true, submitOnChange: true, required: false, image: getAppImg("light_on.png")
                 input "fanList", "capability.switch", title: "Fans: (${fanList ? fanList?.size() : 0} Selected)", multiple: true, submitOnChange: true, required: false, image: getAppImg("fan_on.png")
                 input "speakerList", "capability.switch", title: "Speakers: (${speakerList ? speakerList?.size() : 0} Selected)", multiple: true, submitOnChange: true, required: false, image: getAppImg("media_player.png")
+                input "shadesList", "capability.windowShade", title: "Window Shades: (${shadesList ? shadesList?.size() : 0} Selected)", multiple: true, submitOnChange: true, required: false, image: getAppImg("window_shade.png")
             }
             section("All Other Devices:") {
                 input "sensorList", "capability.sensor", title: "Sensor Devices: (${sensorList ? sensorList?.size() : 0} Selected)", multiple: true, submitOnChange: true, required: false, image: getAppImg("sensors.png")
@@ -195,9 +196,8 @@ def imgTitle(imgSrc, imgWidth, imgHeight, titleStr, color=null) {
 
 def getDeviceCnt() {
     def devices = []
-    def items = ["deviceList", "sensorList", "switchList", "lightList", "fanList", "speakerList", "modeList"]
+    def items = ["deviceList", "sensorList", "switchList", "lightList", "fanList", "speakerList", "shadesList", "modeList"]
     if(isST()) { items?.push("routineList") }
-    if(!isST()) { items?.push("shadesList") }
     items?.each { item ->
         if(settings[item]?.size() > 0) {
             devices = devices + settings[item]
@@ -261,9 +261,8 @@ def onAppTouch(event) {
 
 def renderDevices() {
     def deviceData = []
-    def items = ["deviceList", "sensorList", "switchList", "lightList", "fanList", "speakerList", "modeList"]
+    def items = ["deviceList", "sensorList", "switchList", "lightList", "fanList", "speakerList", "shadesList", "modeList"]
     if(isST()) { items?.push("routineList") }
-    if(!isST()) { items?.push("shadesList") }
     items?.each { item ->
         if(settings[item]?.size()) {
             settings[item]?.each { dev->
@@ -364,9 +363,7 @@ def findDevice(paramid) {
     if (device) return device
     device = speakerList.find { it?.id == paramid }
     if (device) return device
-    if(!isST()) {
-        device = shadesList.find { it?.id == paramid }
-    }
+    device = shadesList.find { it?.id == paramid }
 	return device
 }
 
@@ -628,7 +625,7 @@ def deviceCapabilityList(device) {
     if(settings?.speakerList.find { it?.id == device?.id }) {
         items["Speaker"] = 1
     }
-    if(!isST() && settings?.shadesList.find { it?.id == device?.id }) {
+    if(settings?.shadesList.find { it?.id == device?.id }) {
         items["WindowShade"] = 1
     }
     if(settings?.noTemp && items["Temperature Measurement"] && (items["Contact Sensor"] || items["Water Sensor"])) {
@@ -699,10 +696,8 @@ def registerSwitches() {
     registerChangeHandler(settings?.switchList)
     log.debug "Registering (${settings?.lightList?.size() ?: 0}) Lights"
     registerChangeHandler(settings?.lightList)
-    if(!isST()) {
-        log.debug "Registering (${settings?.shadesList?.size() ?: 0}) Window Shades"
-        registerChangeHandler(settings?.shadesList)
-    }
+    log.debug "Registering (${settings?.shadesList?.size() ?: 0}) Window Shades"
+    registerChangeHandler(settings?.shadesList)
     log.debug "Registered (${getDeviceCnt()} Devices)"
 }
 

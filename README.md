@@ -48,6 +48,8 @@ This is based off of @pdlove homebridge-smartthings
 
 ***v1.5.4*** - Fixes for Local Commands (#24) and a few other tweaks.
 
+***v1.5.5*** - Added more support for blinds under SmartThings.
+
 #### Homebridge Plugin:
 
 ***v1.1.5*** - Lot's of new capabilities supported in HomeKit
@@ -90,6 +92,8 @@ This is based off of @pdlove homebridge-smartthings
 ***v1.5.6*** - Merged changes from @torandreroland for thermostatMode fixes, and from @shnhrrsn button mode fixes.  Updated the request-promise package to v4.2.4
 
 ***v1.5.7*** - Merged Thermostat fixes from @torandreroland, fixed temperatures to support negative temps, and a few other tweaks.
+
+***v1.5.8*** - Merged some fixes in from @prayasb and @nberardi.
 
 <br>
 

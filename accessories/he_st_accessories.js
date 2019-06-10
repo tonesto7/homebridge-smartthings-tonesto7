@@ -76,7 +76,7 @@ function HE_ST_Accessory(platform, device) {
     let isSpeaker = (device.capabilities['Speaker'] !== undefined);
     if (device && device.capabilities) {
         if ((device.capabilities['Switch Level'] !== undefined || device.capabilities['SwitchLevel'] !== undefined) && !isSpeaker && !isFan && !isMode && !isRoutine && !isWindowShade) {
-            if (device.commands.levelOpenClose || device.commands.presetPosition) {
+            if ((platformName === 'SmartThings' && isWindowShade) || device.commands.levelOpenClose || device.commands.presetPosition) {
                 // This is a Window Shade
                 that.deviceGroup = 'window_shades';
                 thisCharacteristic = that.getaddService(Service.WindowCovering).getCharacteristic(Characteristic.TargetPosition)
@@ -84,9 +84,14 @@ function HE_ST_Accessory(platform, device) {
                         callback(null, parseInt(that.device.attributes.level));
                     })
                     .on('set', function(value, callback) {
-                        platform.api.runCommand(callback, device.deviceid, 'setLevel', {
-                            value1: value
-                        });
+                        if (device.commands.close && value === 0) {
+                            // setLevel: 0, not responding on spring fashion blinds
+                            platform.api.runCommand(callback, device.deviceid, 'close');
+                        } else {
+                            platform.api.runCommand(callback, device.deviceid, 'setLevel', {
+                                value1: value
+                            });
+                        }
                     });
                 platform.addAttributeUsage('level', device.deviceid, thisCharacteristic);
                 thisCharacteristic = that.getaddService(Service.WindowCovering).getCharacteristic(Characteristic.CurrentPosition)
