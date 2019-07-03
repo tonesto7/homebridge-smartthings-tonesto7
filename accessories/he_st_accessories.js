@@ -70,7 +70,7 @@ function HE_ST_Accessory(platform, device) {
     // platform.log(JSON.stringify(device));
     let isMode = (device.capabilities['Mode'] !== undefined);
     let isRoutine = (device.capabilities['Routine'] !== undefined);
-    let isFan = (device.capabilities['Fan'] !== undefined || device.capabilities['Fan Light'] !== undefined || device.capabilities['FanLight'] !== undefined || device.commands.lowSpeed !== undefined);
+    let isFan = (device.capabilities['Fan'] !== undefined || device.capabilities['Fan Light'] !== undefined || device.capabilities['FanLight'] !== undefined || device.capabilities['Fan Speed'] || device.commands.lowSpeed !== undefined);
     let isWindowShade = (device.capabilities['WindowShade'] !== undefined || device.capabilities['Window Shade'] !== undefined);
     let isLight = (device.capabilities['LightBulb'] !== undefined || device.capabilities['Light Bulb'] !== undefined || device.capabilities['Bulb'] !== undefined || device.capabilities['Fan Light'] !== undefined || device.capabilities['FanLight'] !== undefined || device.name.includes('light'));
     let isSpeaker = (device.capabilities['Speaker'] !== undefined);
@@ -351,20 +351,24 @@ function HE_ST_Accessory(platform, device) {
             platform.addAttributeUsage('switch', device.deviceid, thisCharacteristic);
 
             if (that.device.attributes.level !== undefined || that.device.attributes.fanSpeed !== undefined) {
-                let fanLvl = that.device.attributes.fanSpeed ? fanSpeedConversion(that.device.attributes.fanSpeed, (device.command['medHighSpeed'] !== undefined)) : parseInt(that.device.attributes.level);
-                platform.log("Fan with (" + that.device.attributes.fanSpeed ? "fanSpeed" : "level" + ') | value: ' + fanLvl);
+                // let fanLvl = that.device.attributes.fanSpeed ? fanSpeedConversionInt(that.device.attributes.fanSpeed, (device.command['medHighSpeed'] !== undefined)) : parseInt(that.device.attributes.level);
+                let fanLvl = parseInt(that.device.attributes.level);
+                // platform.log("Fan with (" + that.device.attributes.fanSpeed ? "fanSpeed" : "level" + ') | value: ' + fanLvl);
+                platform.log("Fan with level at " + fanLvl);
+                // let waitTimer;
                 thisCharacteristic = that.getaddService(Service.Fanv2).getCharacteristic(Characteristic.RotationSpeed)
                     .on('get', function(callback) {
                         callback(null, fanLvl);
                     })
                     .on('set', function(value, callback) {
-                        if (value > 0) {
-                            let cmdStr = (that.device.attributes.fanSpeed) ? 'fanspeed' : 'setLevel';
-                            let cmdVal = (that.device.attributes.fanSpeed) ? fanSpeedConversion(value, (device.command['medHighSpeed'] !== undefined)) : parseInt(value);
-                            platform.log("Fan Command (Str: " + cmdStr + ') | value: (' + cmdVal + ')');
-                            platform.api.runCommand(callback, device.deviceid, cmdStr, {
-                                value1: cmdVal
+                        if (value >= 0 && value <= 100) {
+
+                            // clearTimeout(waitTimer);
+                            // platform.log('Sending Fan value of ' + value);
+                            platform.api.runCommand(callback, device.deviceid, 'setLevel', {
+                                value1: parseInt(value)
                             });
+
                         }
                     });
                 platform.addAttributeUsage('level', device.deviceid, thisCharacteristic);
@@ -991,6 +995,15 @@ function tempConversion(tUnit, tempVal) {
     }
 }
 
+function debounce(a, b, c) {
+    var d;
+    return function() {
+        var e = this,
+            f = arguments;
+        clearTimeout(d), d = setTimeout(function() { d = null, c || a.apply(e, f); }, b), c && !d && a.apply(e, f);
+    };
+}
+
 function fanSpeedConversion(speedVal, has4Spd = false) {
     if (speedVal <= 0) {
         return "off";
@@ -1006,13 +1019,25 @@ function fanSpeedConversion(speedVal, has4Spd = false) {
             return "high";
         }
     } else {
-        if (speedVal > 0 && speedVal <= 33) {
+        if (speedVal > 0 && speedVal <= 32) {
             return "low";
-        } else if (speedVal > 33 && speedVal <= 66) {
+        } else if (speedVal <= 33 && speedVal <= 66) {
             return "medium";
-        } else if (speedVal > 66 && speedVal <= 99) {
+        } else if (speedVal <= 67 && speedVal <= 100) {
             return "high";
         }
+    }
+}
+
+function fanSpeedConversionInt(speedVal) {
+    if (!speedVal || speedVal <= 0) {
+        return "off";
+    } else if (speedVal === 1) {
+        return "low";
+    } else if (speedVal === 2) {
+        return "medium";
+    } else if (speedVal === 3) {
+        return "high";
     }
 }
 
