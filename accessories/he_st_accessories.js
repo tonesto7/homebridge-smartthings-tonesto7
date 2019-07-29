@@ -75,7 +75,7 @@ function HE_ST_Accessory(platform, device) {
     let isLight = (device.capabilities['LightBulb'] !== undefined || device.capabilities['Light Bulb'] !== undefined || device.capabilities['Bulb'] !== undefined || device.capabilities['Fan Light'] !== undefined || device.capabilities['FanLight'] !== undefined || device.name.includes('light'));
     let isSpeaker = (device.capabilities['Speaker'] !== undefined);
     if (device && device.capabilities) {
-        if ((device.capabilities['Switch Level'] !== undefined || device.capabilities['SwitchLevel'] !== undefined) && !isSpeaker && !isFan && !isMode && !isRoutine && !isWindowShade) {
+        if ((device.capabilities['Switch Level'] !== undefined || device.capabilities['SwitchLevel'] !== undefined) && !isSpeaker && !isFan && !isMode && !isRoutine) {
             if ((platformName === 'SmartThings' && isWindowShade) || device.commands.levelOpenClose || device.commands.presetPosition) {
                 // This is a Window Shade
                 that.deviceGroup = 'window_shades';
