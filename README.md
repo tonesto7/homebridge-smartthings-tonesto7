@@ -122,7 +122,7 @@ Installation comes in two parts:
 
 * Log into your SmartThings account at [SmartThings IDE](https://account.smartthings.com/login)
 
-_Note New SmartThings users: You must first enable github integration. (If you use github for work you will probably want to set up a new account as it will request access to your private repos). Only after enabling integration will you see the settings button_
+_Note New SmartThings users: You must first enable github integration. (If you use github for work you will probably want to set up a new account as it will request access to your private repos). Only after enabling integration will you see the settings button. Non-US users [can set it up here](https://graph-eu01-euwest1.api.smartthings.com/githubAuth/step1)_.
 
 * Click on <u><b>```My SmartApps```</b></u>
 * Click on Settings and Add the New repository:
