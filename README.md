@@ -146,7 +146,7 @@ _Note New SmartThings users: You must first enable github integration. (If you u
 
 ## 2. SmartApp Configuration
 
-* In the SmartThings Mobile App, goto <u>```Marketplace```</u> and select <u>```SmartApps```</u>.
+* In the [SmartThings Classic Mobile App](https://apps.apple.com/app/smartthings-classic/id590800740), goto <u>```Marketplace```</u> and select <u>```SmartApps```</u>.
 * At the bottom of the list, select <u>```My Apps```</u>
 * Select <u>```Homebridge (SmartThings)```</u> from the choices on thelist.
 * Configuring the App:
