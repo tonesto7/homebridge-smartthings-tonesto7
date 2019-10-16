@@ -5,7 +5,7 @@
  */
 
 String appVersion() { return "1.5.5" }
-String appModified() { return "09-05-2019" }
+String appModified() { return "10-16-2019" }
 String platform() { return "SmartThings" }
 String appIconUrl() { return "https://raw.githubusercontent.com/tonesto7/homebridge-smartthings-tonesto7/master/images/hb_tonesto7@2x.png" }
 String getAppImg(imgName) { return "https://raw.githubusercontent.com/tonesto7/smartthings-tonesto7-public/master/resources/icons/$imgName" }
@@ -636,15 +636,15 @@ def deviceCapabilityList(device) {
         }
         if(remTemp) { items.remove("Temperature Measurement") }
     }
-    if(settings.removeBattery && items["Battery"] && isDeviceInInput('removeBattery', device?.id)) { items.remove("Battery"); log.debug "Filtering Battery" }
-    if(settings.removeSwitch && items["Switch"] && isDeviceInInput('removeSwitch', device?.id)) { items.remove("Switch"); log.debug "Filtering Switch" }
-    if(settings.removeTemp && items["Temperature Measurement"] && isDeviceInInput('removeTemp', device?.id)) { items.remove("Temperature Measurement"); log.debug "Filtering Temp" }
-    if(settings.removeContact && items["Contact Sensor"] && isDeviceInInput('removeContact', device?.id)) { items.remove("Contact Sensor"); log.debug "Filtering Contact" }
-    if(settings.removeLevel && items["Switch Level"] && isDeviceInInput('removeLevel', device?.id)) { items.remove("Switch Level"); log.debug "Filtering Level" }
-    if(settings.removeMotion && items["Motion Sensor"] && isDeviceInInput('removeMotion', device?.id)) { items.remove("Motion Sensor"); log.debug "Filtering Motion" }
-    if(settings.removePower && items["Power Meter"] && isDeviceInInput('removePower', device?.id)) { items.remove("Power Meter"); log.debug "Filtering Power Meter" }
-    if(settings.removePresence && items["Presence Sensor"] && isDeviceInInput('removePresence', device?.id)) { items.remove("Presence Sensor"); log.debug "Filtering Presence" }
-    if(settings.removeTamper && items["Tamper Alert"] && isDeviceInInput('removeTamper', device?.id)) { items.remove("Tamper Alert"); log.debug "Filtering Tamper" }
+    if(settings.removeBattery && items["Battery"] && isDeviceInInput('removeBattery', device?.id)) { items.remove("Battery"); }// log.debug "Filtering Battery" }
+    if(settings.removeSwitch && items["Switch"] && isDeviceInInput('removeSwitch', device?.id)) { items.remove("Switch"); } //log.debug "Filtering Switch" }
+    if(settings.removeTemp && items["Temperature Measurement"] && isDeviceInInput('removeTemp', device?.id)) { items.remove("Temperature Measurement"); } //log.debug "Filtering Temp" }
+    if(settings.removeContact && items["Contact Sensor"] && isDeviceInInput('removeContact', device?.id)) { items.remove("Contact Sensor"); }// log.debug "Filtering Contact" }
+    if(settings.removeLevel && items["Switch Level"] && isDeviceInInput('removeLevel', device?.id)) { items.remove("Switch Level"); }//log.debug "Filtering Level" }
+    if(settings.removeMotion && items["Motion Sensor"] && isDeviceInInput('removeMotion', device?.id)) { items.remove("Motion Sensor"); } //log.debug "Filtering Motion" }
+    if(settings.removePower && items["Power Meter"] && isDeviceInInput('removePower', device?.id)) { items.remove("Power Meter"); } //log.debug "Filtering Power Meter" }
+    if(settings.removePresence && items["Presence Sensor"] && isDeviceInInput('removePresence', device?.id)) { items.remove("Presence Sensor"); }//log.debug "Filtering Presence" }
+    if(settings.removeTamper && items["Tamper Alert"] && isDeviceInInput('removeTamper', device?.id)) { items.remove("Tamper Alert"); }// log.debug "Filtering Tamper" }
     return items
 }
 
