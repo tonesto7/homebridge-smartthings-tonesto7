@@ -1,25 +1,55 @@
 {
+  "_from": "homebridge-smartthings-tonesto7@1.5.10",
+  "_id": "homebridge-smartthings-tonesto7@1.5.10",
+  "_inBundle": false,
+  "_integrity": "sha512-PlYgKCp34xR2JeOf3oB9wugGXDemtl1vhY9Rw/jRSHMPraVFIElqK6TvnKtN8mutlYscRSdY5oUdKQJbSiVcjg==",
+  "_location": "/homebridge-smartthings-tonesto7",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "homebridge-smartthings-tonesto7@1.5.10",
     "name": "homebridge-smartthings-tonesto7",
-    "description": "SmartThings plugin for HomeBridge",
-    "version": "1.5.10",
-    "license": "ISC",
-    "preferGlobal": true,
-    "keywords": [
-        "homebridge-plugin",
-        "smartthings",
-        "homekit",
-        "homebridge"
-    ],
-    "dependencies": {
-        "request": "^2.88.0",
-        "request-promise": "^4.2.4"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/tonesto7/homebridge-smartthings-tonesto7.git"
-    },
-    "engines": {
-        "node": ">=0.12.0",
-        "homebridge": ">=0.3.1"
-    }
+    "escapedName": "homebridge-smartthings-tonesto7",
+    "rawSpec": "1.5.10",
+    "saveSpec": null,
+    "fetchSpec": "1.5.10"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/homebridge-smartthings-tonesto7/-/homebridge-smartthings-tonesto7-1.5.10.tgz",
+  "_shasum": "d50f6202ad507ffe8e93c6a2bb4c171b6e4096d9",
+  "_spec": "homebridge-smartthings-tonesto7@1.5.10",
+  "_where": "/Users/ianoberst/.homebridge/accessories",
+  "bugs": {
+    "url": "https://github.com/tonesto7/homebridge-smartthings-tonesto7/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4"
+  },
+  "deprecated": false,
+  "description": "SmartThings plugin for HomeBridge",
+  "engines": {
+    "homebridge": ">=0.3.1",
+    "node": ">=0.12.0"
+  },
+  "homepage": "https://github.com/tonesto7/homebridge-smartthings-tonesto7#readme",
+  "keywords": [
+    "homebridge-plugin",
+    "smartthings",
+    "homekit",
+    "homebridge"
+  ],
+  "license": "ISC",
+  "name": "homebridge-smartthings-tonesto7",
+  "preferGlobal": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tonesto7/homebridge-smartthings-tonesto7.git"
+  },
+  "version": "1.5.10"
 }
