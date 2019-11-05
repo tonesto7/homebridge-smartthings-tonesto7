@@ -4,8 +4,8 @@
  *  Copyright 2018, 2019 Anthony Santilli
  */
 
-String appVersion() { return "1.5.5" }
-String appModified() { return "10-16-2019" }
+String appVersion() { return "1.5.6" }
+String appModified() { return "11-05-2019" }
 String platform() { return "SmartThings" }
 String appIconUrl() { return "https://raw.githubusercontent.com/tonesto7/homebridge-smartthings-tonesto7/master/images/hb_tonesto7@2x.png" }
 String getAppImg(imgName) { return "https://raw.githubusercontent.com/tonesto7/smartthings-tonesto7-public/master/resources/icons/$imgName" }
@@ -803,12 +803,12 @@ def changeHandler(evt) {
 
     if (sendEvt && state?.directIP != "" && sendItems?.size()) {
         //Send Using the Direct Mechanism
-        sendItems?.each { si->
+        sendItems?.each { send->
             if(settings?.showLogs) {
                 String unitStr = ""
-                switch(sendItems?.evtAttr as String) {
+                switch(send?.evtAttr as String) {
                     case "temperature":
-                        unitStr = "\u00b0${si?.evtUnit}"
+                        unitStr = "\u00b0${send?.evtUnit}"
                         break
                     case "humidity":
                     case "level":
@@ -822,10 +822,10 @@ def changeHandler(evt) {
                         unitStr = " Lux"
                         break
                     default:
-                        unitStr = si?.evtUnit ?: ""
+                        unitStr = "${send?.evtUnit}"
                         break
                 }
-                log.debug "Sending${" ${si?.evtSource}" ?: ""} Event (${si?.evtDeviceName} | ${si?.evtAttr.toUpperCase()}: ${si?.evtValue}${unitStr}) to Homebridge at (${state?.directIP}:${state?.directPort})"
+                log.debug "Sending${" ${send?.evtSource}" ?: ""} Event (${send?.evtDeviceName} | ${send?.evtAttr.toUpperCase()}: ${send?.evtValue}${unitStr}) to Homebridge at (${state?.directIP}:${state?.directPort})"
             }
             def params = [
                 method: "POST",
@@ -835,11 +835,11 @@ def changeHandler(evt) {
                     'Content-Type': 'application/json'
                 ],
                 body: [
-                    change_name: si?.evtDeviceName,
-                    change_device: si?.evtDeviceId,
-                    change_attribute: si?.evtAttr,
-                    change_value: si?.evtValue,
-                    change_date: si?.evtDate
+                    change_name: send?.evtDeviceName,
+                    change_device: send?.evtDeviceId,
+                    change_attribute: send?.evtAttr,
+                    change_value: send?.evtValue,
+                    change_date: send?.evtDate
                 ]
             ]
             def result = new physicalgraph.device.HubAction(params)

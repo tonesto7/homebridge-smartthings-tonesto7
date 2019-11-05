@@ -4,7 +4,7 @@ This is based off of @pdlove homebridge-smartthings
 
 [![npm version](https://badge.fury.io/js/homebridge-smartthings-tonesto7.svg)](https://badge.fury.io/js/homebridge-smartthings-tonesto7)
 
-**```Current SmartApp version: 1.5.5```**
+**```Current SmartApp version: 1.5.6```**
 
 <br>
 
@@ -50,6 +50,8 @@ This is based off of @pdlove homebridge-smartthings
 
 ***v1.5.5*** - Added more support for blinds under SmartThings.
 
+***v1.5.6*** - Fixes for Issues discovered by @Areson.
+
 #### Homebridge Plugin:
 
 ***v1.1.5*** - Lot's of new capabilities supported in HomeKit
@@ -94,6 +96,8 @@ This is based off of @pdlove homebridge-smartthings
 ***v1.5.7*** - Merged Thermostat fixes from @torandreroland, fixed temperatures to support negative temps, and a few other tweaks.
 
 ***v1.5.8*** - Merged some fixes in from @prayasb and @nberardi.
+
+***v1.5.9*** - Added in Settings support for homebridge-config-ui-x plugin.
 
 <br>
 
@@ -181,7 +185,6 @@ _Note New SmartThings users: You must first enable github integration. (If you u
    <span style="color: #f92672">&quot;platform&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;SmartThings&quot;</span><span style="color: #f8f8f2">,</span>
    <span style="color: #f92672">&quot;name&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;SmartThings&quot;</span><span style="color: #f8f8f2">,</span>
    <span style="color: #f92672">&quot;app_url&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;https://graph.api.smartthings.com:443/api/smartapps/installations/&quot;</span><span style="color: #f8f8f2">,</span>
-   <span style="color: #f92672">&quot;app_id&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;YOUR_APPS_ID&quot;</span><span style="color: #f8f8f2">,</span>
    <span style="color: #f92672">&quot;access_token&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;THIS-SHOULD-BE-YOUR-TOKEN&quot;</span><span style="color: #f8f8f2">,</span>
    <span style="color: #f92672">&quot;update_method&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;direct&quot;</span><span style="color: #f8f8f2">,</span>
    <span style="color: #f92672">&quot;direct_ip&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;10.0.0.70&quot;</span><span style="color: #f8f8f2">,</span>
