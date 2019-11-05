@@ -16,8 +16,6 @@ module.exports = function(oAccessory, oService, oCharacteristic, ouuid, platName
         inherits(HE_ST_Accessory, Accessory);
         HE_ST_Accessory.prototype.loadData = loadData;
         HE_ST_Accessory.prototype.getServices = getServices;
-        HE_ST_Accessory.prototype.CreateFromCachedAccessory = CreateFromCachedAccessory;
-        HE_ST_Accessory.prototype.initializeDeviceCharacteristics = initializeDeviceCharacteristics;
     }
     return HE_ST_Accessory;
 };
@@ -27,16 +25,39 @@ function toTitleCase(str) {
     return str.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
 }
 
-function initializeDeviceCharacteristics(accessory, device, platform) {
-    var that = accessory;
-    
+function HE_ST_Accessory(platform, device) {
+    // console.log("HE_ST_Accessory: ", platform, device);
+    this.deviceid = device.deviceid;
+    this.name = device.name;
+    this.platform = platform;
+    this.state = {};
+    this.device = device;
+    var idKey = 'hbdev:' + platformName.toLowerCase() + ':' + this.deviceid;
+    var id = uuid.generate(idKey);
+    Accessory.call(this, this.name, id);
+    var that = this;
+
+    //Removing excluded capabilities from config
+    for (var i = 0; i < device.excludedCapabilities.length; i++) {
+        let excludedCapability = device.excludedCapabilities[i];
+        if (device.capabilities[excludedCapability] !== undefined) {
+            platform.log.debug("Removing capability: " + excludedCapability + " for device: " + device.name);
+            delete device.capabilities[excludedCapability];
+        }
+    }
+    that.getService(Service.AccessoryInformation)
+        .setCharacteristic(Characteristic.Identify, (device.capabilities['Switch'] !== undefined))
+        .setCharacteristic(Characteristic.FirmwareRevision, device.firmwareVersion)
+        .setCharacteristic(Characteristic.Manufacturer, device.manufacturerName)
+        .setCharacteristic(Characteristic.Model, `${toTitleCase(device.modelName)}`)
+        .setCharacteristic(Characteristic.Name, that.name)
+        .setCharacteristic(Characteristic.SerialNumber, device.serialNumber);
     // Get the Capabilities List
     for (var index in device.capabilities) {
         if (platform.knownCapabilities.indexOf(index) === -1 && platform.unknownCapabilities.indexOf(index) === -1) {
             platform.unknownCapabilities.push(index);
         }
     }
-    
     that.getaddService = function(Service) {
         var myService = that.getService(Service);
         if (!myService) {
@@ -44,7 +65,6 @@ function initializeDeviceCharacteristics(accessory, device, platform) {
         }
         return myService;
     };
-
     that.deviceGroup = 'unknown'; // that way we can easily tell if we set a device group
     var thisCharacteristic;
     // platform.log(JSON.stringify(device));
@@ -54,8 +74,6 @@ function initializeDeviceCharacteristics(accessory, device, platform) {
     let isWindowShade = (device.capabilities['WindowShade'] !== undefined || device.capabilities['Window Shade'] !== undefined);
     let isLight = (device.capabilities['LightBulb'] !== undefined || device.capabilities['Light Bulb'] !== undefined || device.capabilities['Bulb'] !== undefined || device.capabilities['Fan Light'] !== undefined || device.capabilities['FanLight'] !== undefined || device.name.includes('light'));
     let isSpeaker = (device.capabilities['Speaker'] !== undefined);
-    let isSonos = (device.manufacturerName === 'Sonos');
-
     if (device && device.capabilities) {
         if ((device.capabilities['Switch Level'] !== undefined || device.capabilities['SwitchLevel'] !== undefined) && !isSpeaker && !isFan && !isMode && !isRoutine) {
             if ((platformName === 'SmartThings' && isWindowShade) || device.commands.levelOpenClose || device.commands.presetPosition) {
@@ -965,95 +983,8 @@ function initializeDeviceCharacteristics(accessory, device, platform) {
                 });
             platform.addAttributeUsage('alarmSystemStatus', device.deviceid, thisCharacteristic);
         }
-
-        // Sonos Speakers
-        if (isSonos && that.deviceGroup === 'unknown' && false) {
-            that.deviceGroup = 'speakers';
-
-            if (that.device.capabilities['Audio Volume']) {
-                var sonosVolumeTimeout = null;
-                var lastVolumeWriteValue = null;
-
-                thisCharacteristic = that.getaddService(Service.Speaker).getCharacteristic(Characteristic.Volume)
-                .on('get', function(callback) {
-                    platform.log.debug("Reading sonos volume " + that.device.attributes.volume);
-                    callback(null, parseInt(that.device.attributes.volume || 0));
-                })
-                .on('set', function(value, callback) {
-                    if (value > 0 && value !== lastVolumeWriteValue) {
-                        lastVolumeWriteValue = value;
-                        platform.log.debug("Existing volume: " + that.device.attributes.volume + ", set to " + value);
-
-                        // Smooth continuous updates to make more responsive
-                        sonosVolumeTimeout = clearAndSetTimeout(sonosVolumeTimeout, function() {
-                            platform.log.debug("Existing volume: " + that.device.attributes.volume + ", set to " + lastVolumeWriteValue);
-
-                            platform.api.runCommand(callback, device.deviceid, 'setVolume', {
-                                value1: lastVolumeWriteValue
-                            });
-                        }, 1000);
-                    }
-                });
-
-                platform.addAttributeUsage('volume', device.deviceid, thisCharacteristic);
-            }
-            
-            if (that.device.capabilities['Audio Mute']) {
-                thisCharacteristic = that.getaddService(Service.Speaker).getCharacteristic(Characteristic.Mute)
-                .on('get', function(callback) {
-                    callback(null, that.device.attributes.mute === 'muted');
-                })
-                .on('set', function(value, callback) {
-                    if (value === 'muted') {
-                        platform.api.runCommand(callback, device.deviceid, 'mute');
-                    } else {
-                        platform.api.runCommand(callback, device.deviceid, 'unmute');
-                    }
-                });
-                platform.addAttributeUsage('mute', device.deviceid, thisCharacteristic);
-            }
-        }
     }
-}
-
-function HE_ST_Accessory(platform, device) {
-    // console.log("HE_ST_Accessory: ", platform, device);
-    this.deviceid = device.deviceid;
-    this.name = device.name;
-    this.platform = platform;
-    this.state = {};
-    this.device = device;
-    var idKey = 'hbdev:' + platformName.toLowerCase() + ':' + this.deviceid;
-    var id = uuid.generate(idKey);
-    Accessory.call(this, this.name, id);
-    var that = this;
-
-    //Removing excluded capabilities from config
-    for (var i = 0; i < device.excludedCapabilities.length; i++) {
-        let excludedCapability = device.excludedCapabilities[i];
-        if (device.capabilities[excludedCapability] !== undefined) {
-            platform.log.debug("Removing capability: " + excludedCapability + " for device: " + device.name);
-            delete device.capabilities[excludedCapability];
-        }
-    }
-    
-    that.addService(CommunityTypes.SmartThingsDeviceIdService, "SmartThings Device ID", "smartthings_device_id");
-    that.getService(CommunityTypes.SmartThingsDeviceIdService)
-        .setCharacteristic(CommunityTypes.DeviceId, device.deviceid);
-
-    that.getService(Service.AccessoryInformation)
-        .setCharacteristic(Characteristic.Identify, (device.capabilities['Switch'] !== undefined))
-        .setCharacteristic(Characteristic.FirmwareRevision, device.firmwareVersion)
-        .setCharacteristic(Characteristic.Manufacturer, device.manufacturerName)
-        .setCharacteristic(Characteristic.Model, `${toTitleCase(device.modelName)}`)
-        .setCharacteristic(Characteristic.Name, that.name)
-        .setCharacteristic(Characteristic.SerialNumber, device.serialNumber);
-
-    this.initializeDeviceCharacteristics(that, device, platform);
-
     this.loadData(device, that);
-
-    return this;
 }
 
 function tempConversion(tUnit, tempVal) {
@@ -1156,7 +1087,7 @@ function loadData(data, myObject) {
             }
         }
     } else {
-        this.platform.log.debug('Fetching Device Data');
+        this.log.debug('Fetching Device Data');
         this.platform.api.getDevice(this.deviceid, function(data) {
             if (data === undefined) {
                 return;
@@ -1173,41 +1104,4 @@ function loadData(data, myObject) {
 
 function getServices() {
     return this.services;
-}
-
-function clearAndSetTimeout(timeoutReference, fn, timeoutMs) {
-    if (timeoutReference) {
-        clearTimeout(timeoutReference);
-    }
-
-    return setTimeout(fn, timeoutMs);
-}
-
-function CreateFromCachedAccessory(accessory, platform) {
-    var service = accessory.getService("SmartThings Device ID");
-    var deviceid = service.getCharacteristic("Device Id").value;
-    var name = accessory.getService(Service.AccessoryInformation).getCharacteristic(Characteristic.Name).value;
-
-    platform.log.debug("Initializing Cached Device " + deviceid);
-
-    accessory.deviceid = deviceid;
-    accessory.name = name
-    accessory.platform = platform;
-    accessory.state = {};
-    accessory.device = null;
-
-    var loadDataFn = loadData.bind(accessory);
-    var firstLoadfn  = function(data, myObject) {
-        if (!this.device) {
-            this.platform.log.debug("Performing first data load and characteristic initialization.");
-            this.device = data;
-            this.initializeDeviceCharacteristics(this, data, this.platform);
-        }
-
-        loadDataFn(data, myObject);
-    }
-
-    accessory.loadData = firstLoadfn.bind(accessory);
-    accessory.getServices = getServices.bind(accessory);
-    accessory.initializeDeviceCharacteristics = initializeDeviceCharacteristics.bind(accessory);
 }

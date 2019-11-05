@@ -3,7 +3,6 @@ const platformName = 'SmartThings';
 var he_st_api = require('./lib/he_st_api');
 var http = require('http');
 var os = require('os');
-var inherits = require('util').inherits;
 var Service,
     Characteristic,
     Accessory,
@@ -14,14 +13,13 @@ module.exports = function(homebridge) {
     console.log("Homebridge Version: " + homebridge.version);
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
-    Accessory = homebridge.platformAccessory; //homebridge.hap.Accessory;
+    Accessory = homebridge.hap.Accessory;
     uuid = homebridge.hap.uuid;
-
     HE_ST_Accessory = require('./accessories/he_st_accessories')(Accessory, Service, Characteristic, uuid, platformName);
-    homebridge.registerPlatform(pluginName, platformName, HE_ST_Platform, true);    
+    homebridge.registerPlatform(pluginName, platformName, HE_ST_Platform);
 };
 
-function HE_ST_Platform(log, config, api) {
+function HE_ST_Platform(log, config) {
     this.temperature_unit = 'F';
 
     this.app_url = config['app_url'];
@@ -64,20 +62,10 @@ function HE_ST_Platform(log, config, api) {
     }
     this.config = config;
     this.api = he_st_api;
-    //this.he_st_api = he_st_api;
-    //this.api = api;
-    this.homekit_api = api;
     this.log = log;
     this.deviceLookup = {};
     this.firstpoll = true;
     this.attributeLookup = {};
-
-    this.homekit_api.on('didFinishLaunching', function() {
-        this.log("Plugin - DidFinishLaunching");
-
-        // Start the refresh from the server
-        this.accessories(this.processAccessoryCallback);
-    }.bind(this));
 }
 
 HE_ST_Platform.prototype = {
@@ -85,9 +73,9 @@ HE_ST_Platform.prototype = {
         var that = this;
         // that.log('config: ', JSON.stringify(this.config));
         var foundAccessories = [];
-        that.log('Refreshing All Device Data');
+        that.log.debug('Refreshing All Device Data');
         he_st_api.getDevices(function(myList) {
-            that.log('Received All Device Data');
+            that.log.debug('Received All Device Data');
             // success
             if (myList && myList.deviceList && myList.deviceList instanceof Array) {
                 var populateDevices = function(devices) {
@@ -95,25 +83,20 @@ HE_ST_Platform.prototype = {
                         var device = devices[i];
                         device.excludedCapabilities = that.excludedCapabilities[device.deviceid] || ["None"];
                         var accessory;
-
-                        that.log.debug("Processing device id: " + device.deviceid);
-
                         if (that.deviceLookup[device.deviceid]) {
-                            that.log("Existing device, loading...");
                             accessory = that.deviceLookup[device.deviceid];
                             accessory.loadData(devices[i]);
                         } else {
-                            that.log.debug("New Device, initializing...");
                             accessory = new HE_ST_Accessory(that, device);
                             // that.log(accessory);
                             if (accessory !== undefined) {
                                 if (accessory.services.length <= 1 || accessory.deviceGroup === 'unknown') {
                                     if (that.firstpoll) {
-                                        that.log.debug('Device Skipped - Group ' + accessory.deviceGroup + ', Name ' + accessory.name + ', ID ' + accessory.deviceid + ', JSON: ' + JSON.stringify(device));
+                                        that.log('Device Skipped - Group ' + accessory.deviceGroup + ', Name ' + accessory.name + ', ID ' + accessory.deviceid + ', JSON: ' + JSON.stringify(device));
                                     }
                                 } else {
                                     // that.log("Device Added - Group " + accessory.deviceGroup + ", Name " + accessory.name + ", ID " + accessory.deviceid); //+", JSON: "+ JSON.stringify(device));
-                                    that.deviceLookup[device.deviceid] = accessory;
+                                    that.deviceLookup[accessory.deviceid] = accessory;
                                     foundAccessories.push(accessory);
                                 }
                             }
@@ -143,7 +126,8 @@ HE_ST_Platform.prototype = {
         this.log('Fetching ' + platformName + ' devices.');
 
         var that = this;
-
+        // var foundAccessories = [];
+        this.deviceLookup = [];
         this.unknownCapabilities = [];
         this.knownCapabilities = [
             'Switch',
@@ -197,10 +181,7 @@ HE_ST_Platform.prototype = {
             'AlarmSystemStatus',
             'Mode',
             'Routine',
-            'Button',
-            // Sonos Capabilities
-            'Audio Volume',
-            'Audio Mute'
+            'Button'
         ];
         if (platformName === 'Hubitat' || platformName === 'hubitat') {
             let newList = [];
@@ -210,10 +191,10 @@ HE_ST_Platform.prototype = {
             this.knownCapabilities = newList;
         }
 
-        he_st_api.init(this.app_url, this.app_id, this.access_token, this.local_hub_ip, this.local_commands, this.log);
+        he_st_api.init(this.app_url, this.app_id, this.access_token, this.local_hub_ip, this.local_commands);
         this.reloadData(function(foundAccessories) {
             that.log('Unknown Capabilities: ' + JSON.stringify(that.unknownCapabilities));
-            callback.bind(that)(foundAccessories);
+            callback(foundAccessories);
             that.log('update_method: ' + that.update_method);
             setInterval(that.reloadData.bind(that), that.polling_seconds * 1000);
             // Initialize Update Mechanism for realtime-ish updates.
@@ -244,8 +225,7 @@ HE_ST_Platform.prototype = {
     },
 
     processIncrementalUpdate: function(data, that) {
-        that.log.debug('new data: ' + data);
-
+        that.log('new data: ' + data);
         if (data && data.attributes && data.attributes instanceof Array) {
             for (var i = 0; i < data.attributes.length; i++) {
                 that.processFieldUpdate(data.attributes[i], that);
@@ -254,7 +234,8 @@ HE_ST_Platform.prototype = {
     },
 
     processFieldUpdate: function(attributeSet, that) {
-        this.log(attributeSet);
+        // that.log("Processing Update");
+        // that.log(attributeSet);
         if (!(that.attributeLookup[attributeSet.attribute] && that.attributeLookup[attributeSet.attribute][attributeSet.device])) {
             return;
         }
@@ -268,26 +249,8 @@ HE_ST_Platform.prototype = {
                 }
             }
         }
-    },
-
-    processAccessoryCallback: function(foundAccessories) {
-        // loop through accessories adding them to the list and registering them
-        for (var i = 0; i < foundAccessories.length; i++) {
-            var accessoryInstance = foundAccessories[i];
-            var accessoryName = accessoryInstance.name; // assume this property was set
-
-            this.log("Initializing platform accessory '%s'...", accessoryName);
-            this.homekit_api.registerPlatformAccessories(pluginName, platformName, [accessoryInstance]);
-        }
     }
 };
-
-HE_ST_Platform.prototype.configureAccessory = function(accessory) {
-    this.log("Configure Cached Accessory: " + accessory.displayName + ", UUID: " + accessory.UUID);
-
-    HE_ST_Accessory.prototype.CreateFromCachedAccessory(accessory, this);
-    this.deviceLookup[accessory.deviceid] = accessory;
-}
 
 function getIPAddress() {
     var interfaces = os.networkInterfaces();
