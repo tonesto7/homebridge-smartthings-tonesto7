@@ -97,7 +97,7 @@ This is based off of @pdlove homebridge-smartthings
 
 ***v1.5.8*** - Merged some fixes in from @prayasb and @nberardi.
 
-***v1.5.9*** - Added in Settings support for homebridge-config-ui-x plugin.
+***v1.5.11*** - Added in Settings support for homebridge-config-ui-x plugin.
 
 <br>
 
