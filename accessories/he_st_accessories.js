@@ -226,7 +226,7 @@ function HE_ST_Accessory(platform, device) {
             platform.addAttributeUsage('door', device.deviceid, thisCharacteristic);
             that.getaddService(Service.GarageDoorOpener).setCharacteristic(Characteristic.ObstructionDetected, false);
         }
-        if (device.capabilities['Lock'] !== undefined && device.capabilities.Thermostat === undefined) {
+        if (device.capabilities['Lock'] !== undefined && !device.capabilities['Thermostat']) {
             that.deviceGroup = 'locks';
             thisCharacteristic = that.getaddService(Service.LockMechanism).getCharacteristic(Characteristic.LockCurrentState)
                 .on('get', function(callback) {
