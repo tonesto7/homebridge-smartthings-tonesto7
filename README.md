@@ -4,7 +4,7 @@ This is based off of @pdlove homebridge-smartthings
 
 [![npm version](https://badge.fury.io/js/homebridge-smartthings-tonesto7.svg)](https://badge.fury.io/js/homebridge-smartthings-tonesto7)
 
-**```Current SmartApp version: 1.5.6```**
+**```Current SmartApp version: 1.6.0```**
 
 <br>
 
@@ -51,6 +51,8 @@ This is based off of @pdlove homebridge-smartthings
 ***v1.5.5*** - Added more support for blinds under SmartThings.
 
 ***v1.5.6*** - Fixes for Issues discovered by @Areson.
+
+***v1.6.0*** - Added filter to remove buttons from certain devices and removed all references to hubitat from the code.
 
 #### Homebridge Plugin:
 
