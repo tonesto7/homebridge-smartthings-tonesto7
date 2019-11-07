@@ -44,6 +44,7 @@ def mainPage() {
         section("Define Specific Categories:") {
             paragraph "Each category below will adjust the device attributes to make sure they are recognized as the desired device type under HomeKit", state: "complete"
             input "lightList", "capability.switch", title: "Lights: (${lightList ? lightList?.size() : 0} Selected)", multiple: true, submitOnChange: true, required: false, image: getAppImg("light_on.png")
+            input "buttonList", "capability.button", title: "Buttons: (${buttonList ? buttonList?.size() : 0} Selected)", multiple: true, submitOnChange: true, required: false, image: getAppImg("button.png")
             input "fanList", "capability.switch", title: "Fans: (${fanList ? fanList?.size() : 0} Selected)", multiple: true, submitOnChange: true, required: false, image: getAppImg("fan_on.png")
             input "speakerList", "capability.switch", title: "Speakers: (${speakerList ? speakerList?.size() : 0} Selected)", multiple: true, submitOnChange: true, required: false, image: getAppImg("media_player.png")
             input "shadesList", "capability.windowShade", title: "Window Shades: (${shadesList ? shadesList?.size() : 0} Selected)", multiple: true, submitOnChange: true, required: false, image: getAppImg("window_shade.png")
@@ -119,7 +120,7 @@ def imgTitle(imgSrc, imgWidth, imgHeight, titleStr, color=null) {
 
 def getDeviceCnt() {
     def devices = []
-    def items = ["deviceList", "sensorList", "switchList", "lightList", "fanList", "speakerList", "shadesList", "modeList", "routineList"]
+    def items = ["deviceList", "sensorList", "switchList", "lightList", "buttonList", "fanList", "speakerList", "shadesList", "modeList", "routineList"]
     items?.each { item ->
         if(settings[item]?.size() > 0) {
             devices = devices + settings[item]
@@ -176,7 +177,7 @@ def onAppTouch(event) {
 
 def renderDevices() {
     def deviceData = []
-    def items = ["deviceList", "sensorList", "switchList", "lightList", "fanList", "speakerList", "shadesList", "modeList", "routineList"]
+    def items = ["deviceList", "sensorList", "switchList", "lightList", "buttonList", "fanList", "speakerList", "shadesList", "modeList", "routineList"]
     items?.each { item ->
         if(settings[item]?.size()) {
             settings[item]?.each { dev->
@@ -265,19 +266,21 @@ def getSecurityDevice() {
 }
 
 def findDevice(paramid) {
-	def device = deviceList.find { it?.id == paramid }
+	def device = deviceList?.find { it?.id == paramid }
   	if (device) return device
-	device = sensorList.find { it?.id == paramid }
+	device = sensorList?.find { it?.id == paramid }
 	if (device) return device
-  	device = switchList.find { it?.id == paramid }
+  	device = switchList?.find { it?.id == paramid }
     if (device) return device
-    device = lightList.find { it?.id == paramid }
+    device = lightList?.find { it?.id == paramid }
     if (device) return device
-    device = fanList.find { it?.id == paramid }
+    device = buttonList?.find { it?.id == paramid }
     if (device) return device
-    device = speakerList.find { it?.id == paramid }
+    device = fanList?.find { it?.id == paramid }
     if (device) return device
-    device = shadesList.find { it?.id == paramid }
+    device = speakerList?.find { it?.id == paramid }
+    if (device) return device
+    device = shadesList?.find { it?.id == paramid }
 	return device
 }
 
@@ -512,16 +515,19 @@ def deviceQuery() {
 def deviceCapabilityList(device) {
     def items = device?.capabilities?.collectEntries { capability-> [ (capability?.name):1 ] }
     ["Health Check", "Ultraviolet Index", "Indicator"]?.each { if(it in items) { items?.remove(it as String) } }
-    if(settings?.lightList.find { it?.id == device?.id }) {
+    if(settings?.lightList?.find { it?.id == device?.id }) {
         items["LightBulb"] = 1
     }
-    if(settings?.fanList.find { it?.id == device?.id }) {
+    if(settings?.buttonList?.find { it?.id == device?.id }) {
+        items["Button"] = 1
+    }
+    if(settings?.fanList?.find { it?.id == device?.id }) {
         items["Fan"] = 1
     }
-    if(settings?.speakerList.find { it?.id == device?.id }) {
+    if(settings?.speakerList?.find { it?.id == device?.id }) {
         items["Speaker"] = 1
     }
-    if(settings?.shadesList.find { it?.id == device?.id }) {
+    if(settings?.shadesList?.find { it?.id == device?.id }) {
         items["WindowShade"] = 1
     }
     if(settings?.noTemp && items["Temperature Measurement"] && (items["Contact Sensor"] || items["Water Sensor"])) {
@@ -572,6 +578,8 @@ def registerDevices() {
     //This has to be done at startup because it takes too long for a normal command.
     log.debug "Registering (${settings?.fanList?.size() ?: 0}) Fans"
     registerChangeHandler(settings?.fanList)
+    log.debug "Registering (${settings?.buttonList?.size() ?: 0}) Buttons"
+    registerChangeHandler(settings?.buttonList)
     log.debug "Registering (${settings?.deviceList?.size() ?: 0}) Other Devices"
     registerChangeHandler(settings?.deviceList)
 }
