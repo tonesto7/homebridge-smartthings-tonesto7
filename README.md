@@ -101,6 +101,8 @@ This is based off of @pdlove homebridge-smartthings
 
 ***v1.5.14*** - Added in Settings support for homebridge-config-ui-x plugin, added in check to prevent thermostats with the lock capability to be added as locks.
 
+***v1.5.15*** - fixed/removed some Settings support for homebridge-config-ui-x plugin, also made a few minor fixes.
+
 
 <br>
 
