@@ -637,7 +637,7 @@ def registerChangeHandler(devices, showlog=false) {
                     if(skipAtt) { return }
                 }
                 if(att == "battery" && settings?.removeBattery && isDeviceInInput('removeBattery', device?.id)) {return}
-                if(att == "button" && setting?s.removeButton && isDeviceInInput('removeButton', device?.id)) {return}
+                if(att == "button" && settings?.removeButton && isDeviceInInput('removeButton', device?.id)) {return}
                 if(att == "switch" && settings?.removeSwitch && isDeviceInInput('removeSwitch', device?.id)) {return}
                 if(att == "temperature" && settings?.removeTemp && isDeviceInInput('removeTemp', device?.id)) {return}
                 if(att == "contact" && settings?.removeContact && isDeviceInInput('removeContact', device?.id)) {return}
