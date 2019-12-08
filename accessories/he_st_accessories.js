@@ -924,42 +924,44 @@ function HE_ST_Accessory(platform, device) {
                     }
                 });
             // platform.addAttributeUsage("temperature_unit", "platform", thisCharacteristic);
-            thisCharacteristic = that.getaddService(Service.Thermostat).getCharacteristic(Characteristic.HeatingThresholdTemperature)
-                .on('get', function(callback) {
-                    callback(null, tempConversion(platform.temperature_unit, that.device.attributes.heatingSetpoint));
-                })
-                .on('set', function(value, callback) {
-                    // Convert the Celsius value to the appropriate unit for Smartthings
-                    var temp = value;
-                    if (platform.temperature_unit === 'C') {
-                        temp = value;
-                    } else {
-                        temp = value * 1.8 + 32;
-                    }
-                    platform.api.runCommand(callback, device.deviceid, 'setHeatingSetpoint', {
-                        value1: temp
+            if (that.getaddService(Service.Thermostat).getCharacteristic(Characteristic.TargetHeatingCoolingState).props.validValues.includes(3)) {
+                thisCharacteristic = that.getaddService(Service.Thermostat).getCharacteristic(Characteristic.HeatingThresholdTemperature)
+                    .on('get', function(callback) {
+                        callback(null, tempConversion(platform.temperature_unit, that.device.attributes.heatingSetpoint));
+                    })
+                    .on('set', function(value, callback) {
+                        // Convert the Celsius value to the appropriate unit for Smartthings
+                        var temp = value;
+                        if (platform.temperature_unit === 'C') {
+                            temp = value;
+                        } else {
+                            temp = value * 1.8 + 32;
+                        }
+                        platform.api.runCommand(callback, device.deviceid, 'setHeatingSetpoint', {
+                            value1: temp
+                        });
+                        that.device.attributes.heatingSetpoint = temp;
                     });
-                    that.device.attributes.heatingSetpoint = temp;
-                });
-            platform.addAttributeUsage('heatingSetpoint', device.deviceid, thisCharacteristic);
-            thisCharacteristic = that.getaddService(Service.Thermostat).getCharacteristic(Characteristic.CoolingThresholdTemperature)
-                .on('get', function(callback) {
-                    callback(null, tempConversion(platform.temperature_unit, that.device.attributes.coolingSetpoint));
-                })
-                .on('set', function(value, callback) {
-                    // Convert the Celsius value to the appropriate unit for Smartthings
-                    var temp = value;
-                    if (platform.temperature_unit === 'C') {
-                        temp = value;
-                    } else {
-                        temp = value * 1.8 + 32;
-                    }
-                    platform.api.runCommand(callback, device.deviceid, 'setCoolingSetpoint', {
-                        value1: temp
+                platform.addAttributeUsage('heatingSetpoint', device.deviceid, thisCharacteristic);
+                thisCharacteristic = that.getaddService(Service.Thermostat).getCharacteristic(Characteristic.CoolingThresholdTemperature)
+                    .on('get', function(callback) {
+                        callback(null, tempConversion(platform.temperature_unit, that.device.attributes.coolingSetpoint));
+                    })
+                    .on('set', function(value, callback) {
+                        // Convert the Celsius value to the appropriate unit for Smartthings
+                        var temp = value;
+                        if (platform.temperature_unit === 'C') {
+                            temp = value;
+                        } else {
+                            temp = value * 1.8 + 32;
+                        }
+                        platform.api.runCommand(callback, device.deviceid, 'setCoolingSetpoint', {
+                            value1: temp
+                        });
+                        that.device.attributes.coolingSetpoint = temp;
                     });
-                    that.device.attributes.coolingSetpoint = temp;
-                });
-            platform.addAttributeUsage('coolingSetpoint', device.deviceid, thisCharacteristic);
+                platform.addAttributeUsage('coolingSetpoint', device.deviceid, thisCharacteristic);
+            }
         }
         // Alarm System Control/Status
         if (that.device.attributes['alarmSystemStatus'] !== undefined) {
