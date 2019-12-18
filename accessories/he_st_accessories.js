@@ -71,11 +71,13 @@ function HE_ST_Accessory(platform, device) {
     let isMode = (device.capabilities['Mode'] !== undefined);
     let isRoutine = (device.capabilities['Routine'] !== undefined);
     let isFan = (device.capabilities['Fan'] !== undefined || device.capabilities['Fan Light'] !== undefined || device.capabilities['FanLight'] !== undefined || device.capabilities['Fan Speed'] || device.commands.lowSpeed !== undefined);
+    let isAirPurifier = (device.capabilities['custom.airPurifierOperationMode'] !== undefined);
+    let isAirQualitySensor = (device.capabilities['airQuality'] !== undefined);
     let isWindowShade = (device.capabilities['WindowShade'] !== undefined || device.capabilities['Window Shade'] !== undefined);
     let isLight = (device.capabilities['LightBulb'] !== undefined || device.capabilities['Light Bulb'] !== undefined || device.capabilities['Bulb'] !== undefined || device.capabilities['Fan Light'] !== undefined || device.capabilities['FanLight'] !== undefined || device.name.includes('light'));
     let isSpeaker = (device.capabilities['Speaker'] !== undefined);
     if (device && device.capabilities) {
-        if ((device.capabilities['Switch Level'] !== undefined || device.capabilities['SwitchLevel'] !== undefined) && !isSpeaker && !isFan && !isMode && !isRoutine) {
+        if ((device.capabilities['Switch Level'] !== undefined || device.capabilities['SwitchLevel'] !== undefined) && !isSpeaker && !isFan && !isAirPurifier && !isMode && !isRoutine) {
             if ((platformName === 'SmartThings' && isWindowShade) || device.commands.levelOpenClose || device.commands.presetPosition) {
                 // This is a Window Shade
                 that.deviceGroup = 'window_shades';
@@ -148,6 +150,69 @@ function HE_ST_Accessory(platform, device) {
                     platform.addAttributeUsage('saturation', device.deviceid, thisCharacteristic);
                 }
             }
+        } else if (isAirPurifier) {
+                that.deviceGroup = 'air_purifiers';
+
+                let stateName=that.device.attributes.switch;
+                let state=Characteristic.Active.INACTIVE;
+                if (that.device.attributes.switch==="on") state=Characteristic.Active.ACTIVE;
+                thisCharacteristic = that.getaddService(CommunityTypes.NewAirPurifierService).getCharacteristic(Characteristic.Active)
+                    .on('get', function(callback) {
+                        callback(null, state);
+                    })
+                    .on('set', function(value, callback) {
+                        if (value) {
+                            platform.api.runCommand(callback, device.deviceid, 'on');
+                        } else {
+                            platform.api.runCommand(callback, device.deviceid, 'off');
+                        }
+                    });
+
+                thisCharacteristic = that.getaddService(CommunityTypes.NewAirPurifierService).getCharacteristic(Characteristic.CurrentAirPurifierState)
+                    .on('get', function(callback) {
+                        if (state===Characteristic.Active.INACTIVE) {
+                            callback(null, Characteristic.CurrentAirPurifierState.INACTIVE);
+                        }
+                        else {
+                            callback(null, Characteristic.CurrentAirPurifierState.PURIFYING_AIR); //kind of simple but prevents infinite "powering on..."
+                        }
+                    });
+
+                //console.log(that.device.attributes);
+
+                let fanLvlName = that.device.attributes.fanMode;
+                let fanLvl = CommunityTypes.FanOscilationMode.SLEEP;
+                     if (fanLvlName=="low")    fanLvl=CommunityTypes.FanOscilationMode.LOW;
+                else if (fanLvlName=="medium") fanLvl=CommunityTypes.FanOscilationMode.MEDIUM;
+                else if (fanLvlName=="high")   fanLvl=CommunityTypes.FanOscilationMode.HIGH;
+                thisCharacteristic = that.getaddService(CommunityTypes.NewAirPurifierService).getCharacteristic(CommunityTypes.FanOscilationMode)
+                    .on('get', function(callback) {
+                        callback(null, fanLvl);
+                    })
+                    .on('set', function(value, callback) {
+                        if (value>=0 && value<=CommunityTypes.FanOscilationMode.SLEEP){
+                            platform.api.runCommand(callback, device.deviceid, 'setFanMode', {
+                                value1: "sleep"
+                            });
+                        } 
+                        else if (value>CommunityTypes.FanOscilationMode.SLEEP && value<=CommunityTypes.FanOscilationMode.LOW){
+                            platform.api.runCommand(callback, device.deviceid, 'setFanMode', {
+                                value1: "low"
+                            });
+                        } 
+                        else if (value>CommunityTypes.FanOscilationMode.LOW && value<=CommunityTypes.FanOscilationMode.MEDIUM){
+                            platform.api.runCommand(callback, device.deviceid, 'setFanMode', {
+                                value1: "medium"
+                            });
+                        } 
+                        else if (value>CommunityTypes.FanOscilationMode.MEDIUM && value<=CommunityTypes.FanOscilationMode.HIGH){
+                            platform.api.runCommand(callback, device.deviceid, 'setFanMode', {
+                                value1: "high"
+                            });
+                        }
+                    });
+                platform.addAttributeUsage('level', device.deviceid, thisCharacteristic);
+
         }
         if (platformName === 'Hubitat' && isWindowShade) {
             that.deviceGroup = 'window_shades';
@@ -982,6 +1047,14 @@ function HE_ST_Accessory(platform, device) {
                     that.device.attributes.alarmSystemStatus = convertAlarmState(value);
                 });
             platform.addAttributeUsage('alarmSystemStatus', device.deviceid, thisCharacteristic);
+        }
+        if (isAirQualitySensor) {
+            that.deviceGroup = 'sensor';
+            thisCharacteristic = that.getaddService(Service.AirQualitySensor).getCharacteristic(Characteristic.AirQuality)
+                .on('get', function(callback) {
+                    callback(null, Characteristic.AirQuality);
+                });
+            platform.addAttributeUsage('airQuality', device.deviceid, thisCharacteristic);
         }
     }
     this.loadData(device, that);
