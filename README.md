@@ -1,2 +1,3 @@
 # This Plugin is now DEPRECATED... 
-Please use the new version here: https://github.com/tonesto7/homebridge-smartthings-v2
+I've acquired the original homebridge-smartthings repo and npm package from @pdlove and i've updated the code to the latest v2.x
+Please use the new version here: https://github.com/tonesto7/homebridge-smartthings
